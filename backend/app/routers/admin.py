@@ -9,6 +9,7 @@ from app.auth import (
     get_user_roles, get_user_permissions,
 )
 from app.services.audit import log_action
+from app.auth import invalidate_permissions_cache
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
@@ -231,3 +232,41 @@ def list_audit(
             for r in rows
         ],
     }
+
+@router.post("/users/{user_id}/erase")
+def erase_user_data(
+    user_id: uuid.UUID,
+    admin: models.User = Depends(require_permissions("users.manage")),
+    db: Session = Depends(get_db),
+):
+    """Anonimiza conversaciones y tickets de un usuario (derecho al olvido)."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # No se puede borrar audit_log (append-only); se anonimiza referencia
+    db.execute(text("""
+        UPDATE chat_messages SET content = '[REDACTADO POR DERECHO AL OLVIDO]'
+        WHERE chat_id IN (SELECT id FROM chat_history WHERE user_id = :u)
+    """), {"u": user_id})
+    db.execute(text("""
+        UPDATE tickets SET description = '[REDACTADO]', resolution = NULL
+        WHERE reported_by = :u
+    """), {"u": user_id})
+    user.email = f"erased+{user.id}@anon.local"
+    user.full_name = "[Anonimizado]"
+    user.is_active = False
+    db.commit()
+    invalidate_permissions_cache()
+
+    log_action(db, user_id=admin.id, module="admin", action="user_erase",
+               entity="user", entity_id=str(user_id))
+    return {"ok": True}
+
+@router.post("/retention/run")
+def run_retention(
+    _: models.User = Depends(require_permissions("users.manage")),
+):
+    from scripts.retention import run
+    result = run()
+    return {"ok": True, "deleted": result}

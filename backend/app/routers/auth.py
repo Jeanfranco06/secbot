@@ -15,8 +15,8 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 from app.ratelimit import limit_login
 
 @router.post("/login")
-def login(payload, request, db=Depends(get_db)):
-    limit_login(request):
+def login(payload: schemas.LoginIn, request: Request, db: Session = Depends(get_db)):
+    limit_login(request)
     user = db.query(models.User).filter(models.User.email == payload.email).first()
     ip = request.client.host if request.client else None
     ua = request.headers.get("user-agent", "")[:255]

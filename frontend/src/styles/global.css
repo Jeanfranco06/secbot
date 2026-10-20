@@ -1,0 +1,199 @@
+/* ==========================================================================
+   GLOBAL STYLES & RESET
+   ========================================================================== */
+@import "./tokens.css";
+@import "./utilities.css";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--f-base);
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--c-text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: 24px; line-height: 1.25; }
+h2 { font-size: 20px; line-height: 1.3; }
+h3 { font-size: 16px; line-height: 1.4; }
+h4 { font-size: 14px; line-height: 1.4; }
+
+p {
+  color: var(--c-text-secondary);
+}
+
+a {
+  color: var(--c-primary);
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+
+a:hover {
+  color: var(--c-primary-hover);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-border-subtle);
+  border-radius: var(--r-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-text-muted);
+}
+
+/* Definition lists and json viewers */
+.json-view {
+  background: var(--c-bg-subtle);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-border);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  overflow: auto;
+  max-height: 60vh;
+  color: var(--c-text-secondary);
+}
+
+.def-list {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  row-gap: 10px;
+  column-gap: 16px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.def-list dt {
+  color: var(--c-text-muted);
+  font-weight: 500;
+}
+
+.def-list dd {
+  margin: 0;
+  color: var(--c-text);
+}
+
+@media (max-width: 640px) {
+  .def-list {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATION STACK (Fixed overlay, no layout intersection)
+   ========================================================================== */
+.toast-stack {
+  position: fixed;
+  bottom: var(--s-6);
+  right: var(--s-6);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  max-width: 420px;
+  width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--sh-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border: 1px solid transparent;
+}
+
+.toast-success {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-color: var(--c-success-border);
+  border-left: 4px solid var(--c-success);
+}
+
+.toast-error {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-color: var(--c-danger-border);
+  border-left: 4px solid var(--c-danger);
+}
+
+.toast-warning {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-color: var(--c-warning-border);
+  border-left: 4px solid var(--c-warning);
+}
+
+.toast-info {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-color: var(--c-info-border);
+  border-left: 4px solid var(--c-info);
+}
+
+.toast .icon-btn {
+  color: var(--c-text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color var(--t-fast);
+}
+
+.toast .icon-btn:hover {
+  color: var(--c-text);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

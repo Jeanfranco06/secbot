@@ -7,11 +7,12 @@ import json
 import uuid
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from sqlalchemy.orm import Session
-from jose import jwt, JWTError
+from jose import JWTError
+from app.auth import decode_token
 from app.config import settings
 from app.database import SessionLocal
 from app import models
-from app.services import rag, classifier, tickets, pii, cache
+from app.services import rag, classifier, tickets, pii, cache, prompt_guard
 from app.services.audit import log_action
 from app import observability
 
@@ -19,8 +20,8 @@ router = APIRouter()
 
 async def _auth(token: str, db: Session):
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-    except JWTError:
+        payload = decode_token(token)
+    except Exception:
         return None
     if payload.get("kind") != "access":
         return None
@@ -47,6 +48,10 @@ async def chat_ws(ws: WebSocket):
         while True:
             raw = await ws.receive_text()
             data = json.loads(raw)
+            guard = prompt_guard.check(data.get("message", ""))
+            if not guard.ok:
+                await ws.send_json({"type": "error", "detail": f"rechazado: {guard.reason}"})
+                continue
             message = (data.get("message") or "").strip()
             if not message:
                 await ws.send_json({"type": "error", "detail": "mensaje vacío"})

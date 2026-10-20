@@ -1,12 +1,10 @@
-version: "3.9"
-
 services:
   postgres:
     image: pgvector/pgvector:pg16
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-secbot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secbot_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-secbot}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -19,7 +17,7 @@ services:
       - -c
       - log_min_duration_statement=500
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-secbot}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,32 +37,38 @@ services:
     image: n8nio/n8n:latest
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - WEBHOOK_URL=https://n8n.empresa.local/
-      - N8N_SECRET=${N8N_SECRET}
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin1234}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-super_secret_encryption_key_32chars}
+      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_SECRET=${N8N_SECRET:-n8n_secret_token}
+    ports:
+      - "${N8N_PORT:-5678}:5678"
     volumes: [ n8ndata:/home/node/.n8n ]
     restart: unless-stopped
 
   backend:
     build: ./backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-secbot}:${POSTGRES_PASSWORD:-secbot_secret}@postgres:5432/${POSTGRES_DB:-secbot}
       - REDIS_URL=redis://redis:6379/0
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_32_characters_long}
       - JWT_SECRET_OLD=${JWT_SECRET_OLD:-}
+      - JWT_PRIVATE_KEY_PATH=/run/secrets/jwt_private.pem
+      - JWT_PUBLIC_KEY_PATH=/run/secrets/jwt_public.pem
       - OLLAMA_BASE_URL=http://ollama:11434
-      - LLM_MODEL=${LLM_MODEL}
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
-      - RERANK_ENABLED=true
+      - LLM_MODEL=${LLM_MODEL:-llama3.2:3b-instruct-q4_K_M}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-intfloat/multilingual-e5-large}
+      - RERANK_ENABLED=${RERANK_ENABLED:-false}
       - CACHE_TTL_SECONDS=300
       - N8N_WEBHOOK_URL=http://n8n:5678/webhook/security-incident
-      - N8N_SECRET=${N8N_SECRET}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - N8N_SECRET=${N8N_SECRET:-n8n_secret_token}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
       - ENV=production
     depends_on:
@@ -75,14 +79,25 @@ services:
       resources:
         limits: { cpus: "4.0", memory: 4G }
     restart: unless-stopped
+    secrets:
+      - source: jwt_private
+        target: jwt_private.pem
+      - source: jwt_public
+        target: jwt_public.pem
 
   frontend:
     build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
     restart: unless-stopped
 
   caddy:
     image: caddy:2-alpine
-    ports: [ "80:80", "443:443" ]
+    ports:
+      - "${CADDY_HTTP_PORT:-8080}:80"
+      - "${CADDY_HTTPS_PORT:-8443}:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
@@ -91,6 +106,8 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.54.1
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml
       - prom_data:/prometheus
@@ -98,8 +115,10 @@ services:
 
   grafana:
     image: grafana/grafana:11.2.0
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
     volumes: [ grafana_data:/var/lib/grafana ]
     restart: unless-stopped
 
@@ -110,7 +129,6 @@ services:
   promtail:
     image: grafana/promtail:3.1.1
     volumes:
-      - /var/log:/var/log:ro
       - ./ops/promtail.yml:/etc/promtail/config.yml
     restart: unless-stopped
 
@@ -128,3 +146,9 @@ volumes:
   caddy_config:
   prom_data:
   grafana_data:
+
+secrets:
+  jwt_private:
+    file: ./ops/jwt/private.pem
+  jwt_public:
+    file: ./ops/jwt/public.pem

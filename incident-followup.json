@@ -1,0 +1,64 @@
+{
+  "name": "incident-followup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 10 * * *" }] }
+      },
+      "id": "cron",
+      "name": "Cron 10:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT t.id, t.ticket_number, t.severity, t.title, t.status,\n       t.created_at, t.reported_by,\n       u.email AS reporter_email, u.full_name AS reporter_name,\n       FLOOR(EXTRACT(EPOCH FROM (now() - t.created_at))/3600) AS hours_since\nFROM tickets t\nLEFT JOIN users u ON u.id = t.reported_by\nWHERE t.status IN ('nuevo','en_progreso')\n  AND t.created_at < now() - interval '24 hours'\n  AND COALESCE(t.metadata->>'followup_sent', 'false') <> 'true'\n  AND t.created_at > now() - interval '7 days'\nLIMIT 100;",
+        "options": {}
+      },
+      "id": "pg-followup",
+      "name": "PG Follow-up",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [420, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $json.reporter_email }}",
+        "subject": "=[SECBOT] Seguimiento a tu reporte {{ $json.ticket_number }}",
+        "emailType": "html",
+        "message": "=<p>Hola {{ $json.reporter_name }},</p>\n<p>Tu reporte <b>{{ $json.ticket_number }}</b> ({{ $json.severity }}) sigue <b>{{ $json.status }}</b>.</p>\n<p>Abierto hace {{ Math.floor($json.hours_since) }} horas. El equipo de Seguridad lo está atendiendo.</p>\n<p>Si tienes información adicional, responde a este correo.</p>"
+      },
+      "id": "email",
+      "name": "Email Follow-up",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [640, 300],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets\nSET metadata = COALESCE(metadata, '{}'::jsonb)\n  || jsonb_build_object('followup_sent', true, 'followup_at', now()::text)\nWHERE id = '{{ $json.id }}';",
+        "options": {}
+      },
+      "id": "pg-mark",
+      "name": "PG Marcar Follow-up",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [860, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    }
+  ],
+  "connections": {
+    "Cron 10:00": { "main": [[{ "node": "PG Follow-up", "type": "main", "index": 0 }]] },
+    "PG Follow-up": { "main": [[{ "node": "Email Follow-up", "type": "main", "index": 0 }]] },
+    "Email Follow-up": { "main": [[{ "node": "PG Marcar Follow-up", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "sla" }]
+}

@@ -1,0 +1,31 @@
+name: rag-eval
+on:
+  pull_request:
+    paths:
+      - "backend/app/services/rag.py"
+      - "backend/app/services/classifier.py"
+      - "ops/rag_eval/**"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: secbot
+          POSTGRES_PASSWORD: secbot
+          POSTGRES_DB: secbot
+        ports: ["5432:5432"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r backend/requirements.txt
+      - run: pip install ragas datasets
+      - run: |
+          cd backend
+          alembic upgrade head
+          python -m ops.seed_kb_fixtures
+          python -m ops.rag_eval.run_eval
+      - run: python ops/rag_eval/check_thresholds.py

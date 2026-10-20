@@ -1,0 +1,109 @@
+{
+  "name": "sla-escalation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "*/15 * * * *" }] }
+      },
+      "id": "cron",
+      "name": "Cron cada 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, ticket_number, severity, title, status, assigned_to, due_at, reported_by,\n       EXTRACT(EPOCH FROM (now() - due_at))/3600 AS hours_overdue\nFROM tickets\nWHERE status IN ('nuevo','en_progreso')\n  AND due_at < now()\n  AND COALESCE(metadata->>'escalated', 'false') <> 'true'\nORDER BY hours_overdue DESC\nLIMIT 50;",
+        "options": {}
+      },
+      "id": "pg-overdue",
+      "name": "PG Tickets Vencidos",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [420, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(({ json }) => ({ json }));"
+      },
+      "id": "split",
+      "name": "Split",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            { "value1": "={{ $json.severity }}", "value2": "P1" }
+          ]
+        }
+      },
+      "id": "if-p1",
+      "name": "IF P1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#seguridad-critico", "mode": "name" },
+        "text": "=🔴 *ESCALADO P1 — {{ $json.ticket_number }}*\n{{ $json.title }}\nVencido hace {{ Math.floor($json.hours_overdue) }}h\n<a href=\"https://secbot.empresa.local/tickets/{{ $json.id }}\">Atender ahora</a>"
+      },
+      "id": "slack-p1",
+      "name": "Slack Escalado P1",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1080, 220],
+      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $env.SECURITY_EMAIL }}",
+        "subject": "=[SECBOT][ESCALADO] {{ $json.ticket_number }} vencido",
+        "emailType": "html",
+        "message": "=<p>Ticket <b>{{ $json.ticket_number }}</b> ({{ $json.severity }}) vencido hace {{ Math.floor($json.hours_overdue) }}h.</p><p>{{ $json.title }}</p>"
+      },
+      "id": "email",
+      "name": "Email Escalado",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1080, 380],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets\nSET metadata = COALESCE(metadata, '{}'::jsonb)\n  || jsonb_build_object('escalated', true, 'escalated_at', now()::text)\nWHERE id = '{{ $json.id }}';\n\nINSERT INTO audit_log (module, action, entity, entity_id, result, input)\nVALUES ('n8n', 'sla_escalation', 'ticket', '{{ $json.id }}', 'ok',\n        jsonb_build_object('hours_overdue', {{ $json.hours_overdue }}));",
+        "options": {}
+      },
+      "id": "pg-mark",
+      "name": "PG Marcar Escalado",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1300, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    }
+  ],
+  "connections": {
+    "Cron cada 15 min": { "main": [[{ "node": "PG Tickets Vencidos", "type": "main", "index": 0 }]] },
+    "PG Tickets Vencidos": { "main": [[{ "node": "Split", "type": "main", "index": 0 }]] },
+    "Split": { "main": [[{ "node": "IF P1", "type": "main", "index": 0 }]] },
+    "IF P1": {
+      "main": [
+        [{ "node": "Slack Escalado P1", "type": "main", "index": 0 }],
+        [{ "node": "Email Escalado", "type": "main", "index": 0 }]
+      ]
+    },
+    "Slack Escalado P1": { "main": [[{ "node": "PG Marcar Escalado", "type": "main", "index": 0 }]] },
+    "Email Escalado": { "main": [[{ "node": "PG Marcar Escalado", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "sla" }]
+}

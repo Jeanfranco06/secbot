@@ -1,0 +1,38 @@
+{
+  "name": "kb-reindex-notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kb-updated",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wh",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "kb-updated"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#seguridad", "mode": "name" },
+        "text": "=📚 KB actualizada por {{ $json.body.user }}\nDocumento: *{{ $json.body.title }}* v{{ $json.body.version }}\nChunks: {{ $json.body.chunks }}\nAcción: {{ $json.body.action }}"
+      },
+      "id": "slack",
+      "name": "Slack KB",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [420, 300],
+      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Slack KB", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "kb" }]
+}

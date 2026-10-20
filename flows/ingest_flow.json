@@ -1,0 +1,48 @@
+{
+  "id": "ingest-v1",
+  "name": "SecBot Ingesta",
+  "data": {
+    "nodes": [
+      {
+        "id": "FileInput-1",
+        "type": "File",
+        "position": { "x": 100, "y": 200 },
+        "data": { "id": "FileInput-1", "type": "File", "node": { "display_name": "PDF/DOCX/MD" } }
+      },
+      {
+        "id": "Splitter-1",
+        "type": "SplitText",
+        "position": { "x": 400, "y": 200 },
+        "data": {
+          "id": "Splitter-1",
+          "type": "SplitText",
+          "node": { "display_name": "Chunking", "chunk_size": 800, "chunk_overlap": 120 }
+        }
+      },
+      {
+        "id": "Embeddings-1",
+        "type": "HuggingFaceEmbeddings",
+        "position": { "x": 700, "y": 200 },
+        "data": { "id": "Embeddings-1", "type": "HuggingFaceEmbeddings", "node": { "display_name": "Embeddings", "model_name": "intfloat/multilingual-e5-large" } }
+      },
+      {
+        "id": "PGVector-1",
+        "type": "PGVector",
+        "position": { "x": 1000, "y": 200 },
+        "data": { "id": "PGVector-1", "type": "PGVector", "node": { "display_name": "PGVector Store", "collection_name": "kb_chunks" } }
+      },
+      {
+        "id": "ChatOutput-1",
+        "type": "ChatOutput",
+        "position": { "x": 1300, "y": 200 },
+        "data": { "id": "ChatOutput-1", "type": "ChatOutput", "node": { "display_name": "OK" } }
+      }
+    ],
+    "edges": [
+      { "source": "FileInput-1", "target": "Splitter-1" },
+      { "source": "Splitter-1", "target": "Embeddings-1" },
+      { "source": "Embeddings-1", "target": "PGVector-1" },
+      { "source": "PGVector-1", "target": "ChatOutput-1" }
+    ]
+  }
+}

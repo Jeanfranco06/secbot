@@ -1,202 +1,260 @@
 {
-    "name": "security-incident",
-    "nodes": [
-        {
-            "parameters": {
-                "httpMethod": "POST",
-                "path": "security-incident",
-                "responseMode": "responseNode",
-                "options": {}
-            },
-            "name": "Webhook",
-            "type": "n8n-nodes-base.webhook",
-            "typeVersion": 2,
-            "position": [
-                200,
-                300
-            ],
-            "webhookId": "security-incident"
-        },
-        {
-            "parameters": {
-                "conditions": {
-                    "string": [
-                        {
-                            "value1": "={{ $json.headers['x-n8n-secret'] }}",
-                            "operation": "equals",
-                            "value2": "={{ $env.N8N_SECRET }}"
-                        }
-                    ]
-                }
-            },
-            "name": "Validar Secreto",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 1,
-            "position": [
-                420,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "operation": "executeQuery",
-                "query": "UPDATE tickets SET updated_at = now() WHERE id = '{{ $json.body.ticket_id }}';",
-                "options": {}
-            },
-            "name": "Postgres Update",
-            "type": "n8n-nodes-base.postgres",
-            "typeVersion": 2.4,
-            "position": [
-                640,
-                220
-            ]
-        },
-        {
-            "parameters": {
-                "conditions": {
-                    "string": [
-                        {
-                            "value1": "={{ $json.body.severity }}",
-                            "operation": "regex",
-                            "value2": "^(P1|P2)$"
-                        }
-                    ]
-                }
-            },
-            "name": "IF Urgente",
-            "type": "n8n-nodes-base.if",
-            "typeVersion": 1,
-            "position": [
-                860,
-                220
-            ]
-        },
-        {
-            "parameters": {
-                "fromEmail": "secbot@empresa.local",
-                "toEmail": "security@empresa.local",
-                "subject": "=[SECBOT][{{ $json.body.severity }}] {{ $json.body.title }}",
-                "emailType": "html",
-                "message": "=<p><b>Ticket:</b> {{ $json.body.ticket_number }}</p><p><b>Categoría:</b> {{ $json.body.category }}</p><p><b>Reportado por:</b> {{ $json.body.reported_by }}</p>"
-            },
-            "name": "Email Urgente",
-            "type": "n8n-nodes-base.emailSend",
-            "typeVersion": 2.1,
-            "position": [
-                1080,
-                140
-            ]
-        },
-        {
-            "parameters": {
-                "fromEmail": "secbot@empresa.local",
-                "toEmail": "security@empresa.local",
-                "subject": "=[SECBOT][{{ $json.body.severity }}] Nuevo ticket {{ $json.body.ticket_number }}",
-                "emailType": "html",
-                "message": "=<p>Ticket {{ $json.body.ticket_number }} ({{ $json.body.severity }})</p><p>{{ $json.body.title }}</p>"
-            },
-            "name": "Email Normal",
-            "type": "n8n-nodes-base.emailSend",
-            "typeVersion": 2.1,
-            "position": [
-                1080,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "respondWith": "json",
-                "responseBody": "={\"ok\": true, \"ticket_id\": \"{{ $json.body.ticket_id }}\"}"
-            },
-            "name": "Respond to Webhook",
-            "type": "n8n-nodes-base.respondToWebhook",
-            "typeVersion": 1,
-            "position": [
-                1300,
-                220
-            ]
+  "name": "security-incident",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "security-incident",
+        "responseMode": "responseNode",
+        "options": { "rawBody": false }
+      },
+      "id": "wh-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "security-incident"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.headers['x-n8n-secret'] }}",
+              "operation": "equals",
+              "value2": "={{ $env.N8N_SECRET }}"
+            }
+          ]
         }
-    ],
-    "connections": {
-        "Webhook": {
-            "main": [
-                [
-                    {
-                        "node": "Validar Secreto",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Validar Secreto": {
-            "main": [
-                [
-                    {
-                        "node": "Postgres Update",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                [
-                    {
-                        "node": "Respond to Webhook",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Postgres Update": {
-            "main": [
-                [
-                    {
-                        "node": "IF Urgente",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "IF Urgente": {
-            "main": [
-                [
-                    {
-                        "node": "Email Urgente",
-                        "type": "main",
-                        "index": 0
-                    }
-                ],
-                [
-                    {
-                        "node": "Email Normal",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Email Urgente": {
-            "main": [
-                [
-                    {
-                        "node": "Respond to Webhook",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Email Normal": {
-            "main": [
-                [
-                    {
-                        "node": "Respond to Webhook",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
+      },
+      "id": "if-secret",
+      "name": "Validar Secreto",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"error\":\"unauthorized\"}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-401",
+      "name": "Respond 401",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [640, 460]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, ticket_number, severity, category, title, chat_id, reported_by,\n       COALESCE(metadata->>'notified', 'false') AS notified,\n       created_at\nFROM tickets WHERE id = '{{ $json.body.ticket_id }}';",
+        "options": {}
+      },
+      "id": "pg-fetch",
+      "name": "PG Fetch Ticket",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [640, 220],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Deduplicación y cálculo de SLA\nconst rows = $input.all();\nif (!rows.length) return [];\nconst r = rows[0].json;\n\nif (String(r.notified).toLowerCase() === 'true') {\n  return [{ json: { ...r, skip: true, reason: 'already_notified' } }];\n}\n\nconst SLA = { P1: 1, P2: 4, P3: 24, P4: 72 };\nconst hours = SLA[r.severity] || 72;\nconst dueAt = new Date(Date.now() + hours * 3600 * 1000).toISOString();\n\nconst channel =\n  r.severity === 'P1' ? ['slack','email','teams'] :\n  r.severity === 'P2' ? ['slack','email'] :\n  ['email'];\n\nreturn [{ json: { ...r, skip: false, sla_hours: hours, due_at: dueAt, channels: channel } }];"
+      },
+      "id": "code-enrich",
+      "name": "Enriquecer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 220]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            { "value1": "={{ $json.skip }}", "value2": true }
+          ]
         }
+      },
+      "id": "if-skip",
+      "name": "IF Deduplicado",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1080, 220]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets\nSET due_at = '{{ $json.due_at }}'::timestamptz,\n    updated_at = now()\nWHERE id = '{{ $json.id }}';\n",
+        "options": {}
+      },
+      "id": "pg-update-sla",
+      "name": "PG Update SLA",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1300, 120]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "string": [{ "value1": "={{ $json.severity }}", "value2": "P1" }] }, "outputKey": "P1" },
+            { "conditions": { "string": [{ "value1": "={{ $json.severity }}", "value2": "P2" }] }, "outputKey": "P2" }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "switch-severity",
+      "name": "Switch Severidad",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1520, 120]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#seguridad-critico", "mode": "name" },
+        "text": "=🚨 *P1 — {{ $json.ticket_number }}*\n{{ $json.title }}\nCategoría: `{{ $json.category }}`\nReportado por: `{{ $json.reported_by }}`\nSLA: {{ $json.sla_hours }}h\n<a href=\"https://secbot.empresa.local/tickets/{{ $json.id }}\">Ver ticket</a>",
+        "otherOptions": {}
+      },
+      "id": "slack-p1",
+      "name": "Slack P1",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1740, 40],
+      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#seguridad", "mode": "name" },
+        "text": "=⚠️ *P2 — {{ $json.ticket_number }}*\n{{ $json.title }}\nCategoría: `{{ $json.category }}`\nSLA: {{ $json.sla_hours }}h",
+        "otherOptions": {}
+      },
+      "id": "slack-p2",
+      "name": "Slack P2",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1740, 200],
+      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "security@empresa.local",
+        "subject": "=[SECBOT][{{ $json.severity }}] {{ $json.ticket_number }} — {{ $json.title }}",
+        "emailType": "html",
+        "message": "=<h2>Nuevo incidente {{ $json.severity }}</h2>\n<p><b>Ticket:</b> {{ $json.ticket_number }}</p>\n<p><b>Categoría:</b> {{ $json.category }}</p>\n<p><b>Título:</b> {{ $json.title }}</p>\n<p><b>SLA:</b> {{ $json.sla_hours }} horas</p>\n<p><b>Reportado por:</b> {{ $json.reported_by }}</p>\n<p><a href=\"https://secbot.empresa.local/tickets/{{ $json.id }}\">Abrir ticket</a></p>",
+        "options": {}
+      },
+      "id": "email",
+      "name": "Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1960, 120],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "teamId": { "__rl": true, "value": "sec-team", "mode": "id" },
+        "channelId": { "__rl": true, "value": "19:oncall@thread.tacv2", "mode": "id" },
+        "text": "🚨 P1 — {{ $json.ticket_number }}: {{ $json.title }}"
+      },
+      "id": "teams-p1",
+      "name": "Teams P1",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [1960, 40],
+      "credentials": { "microsoftTeamsOAuth2Api": { "id": "1", "name": "secbot-teams" } },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets\nSET metadata = COALESCE(metadata, '{}'::jsonb)\n  || jsonb_build_object('notified', true, 'notified_at', now()::text)\nWHERE id = '{{ $json.id }}';\n\nINSERT INTO audit_log (module, action, entity, entity_id, result, input)\nVALUES ('n8n', 'notify_incident', 'ticket', '{{ $json.id }}', 'ok',\n        jsonb_build_object('severity', '{{ $json.severity }}', 'channels', '{{ JSON.stringify($json.channels) }}'::jsonb));\n",
+        "options": {}
+      },
+      "id": "pg-mark-notified",
+      "name": "PG Mark Notified",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [2180, 120]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"ticket_id\": \"{{ $json.id }}\", \"notified\": true}"
+      },
+      "id": "respond-200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2400, 120]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"skipped\": \"{{ $json.reason }}\"}"
+      },
+      "id": "respond-skip",
+      "name": "Respond Skip",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 320]
     }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Validar Secreto", "type": "main", "index": 0 }]] },
+    "Validar Secreto": {
+      "main": [
+        [{ "node": "PG Fetch Ticket", "type": "main", "index": 0 }],
+        [{ "node": "Respond 401", "type": "main", "index": 0 }]
+      ]
+    },
+    "PG Fetch Ticket": { "main": [[{ "node": "Enriquecer", "type": "main", "index": 0 }]] },
+    "Enriquecer": { "main": [[{ "node": "IF Deduplicado", "type": "main", "index": 0 }]] },
+    "IF Deduplicado": {
+      "main": [
+        [{ "node": "Respond Skip", "type": "main", "index": 0 }],
+        [{ "node": "PG Update SLA", "type": "main", "index": 0 }]
+      ]
+    },
+    "PG Update SLA": { "main": [[{ "node": "Switch Severidad", "type": "main", "index": 0 }]] },
+    "Switch Severidad": {
+      "main": [
+        [{ "node": "Slack P1", "type": "main", "index": 0 }],
+        [{ "node": "Slack P2", "type": "main", "index": 0 }],
+        [{ "node": "Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Slack P1": { "main": [[{ "node": "Teams P1", "type": "main", "index": 0 }]] },
+    "Teams P1": { "main": [[{ "node": "Email", "type": "main", "index": 0 }]] },
+    "Slack P2": { "main": [[{ "node": "Email", "type": "main", "index": 0 }]] },
+    "Email": { "main": [[{ "node": "PG Mark Notified", "type": "main", "index": 0 }]] },
+    "PG Mark Notified": { "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "America/Lima"
+  },
+  "staticData": null,
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": [{ "name": "secbot" }, { "name": "incidentes" }],
+  "active": true,
+  "versionId": "1"
 }

@@ -1,0 +1,11 @@
+# ops/ha/docker-compose.ha.yml (perfiles separados)
+services:
+  etcd1: { image: quay.io/coreos/etcd:v3.5.15, ... }
+  etcd2: { image: quay.io/coreos/etcd:v3.5.15, ... }
+  etcd3: { image: quay.io/coreos/etcd:v3.5.15, ... }
+  patroni1: { image: patroni:latest, ... }
+  patroni2: { image: patroni:latest, ... }
+  patroni3: { image: patroni:latest, ... }
+  haproxy:
+    image: haproxy:2.9-alpine
+    volumes: [./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg]

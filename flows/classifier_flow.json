@@ -1,0 +1,79 @@
+{
+  "id": "classifier-v1",
+  "name": "SecBot Classifier",
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-1",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 200 },
+        "data": { "id": "ChatInput-1", "type": "ChatInput", "node": { "display_name": "Mensaje" } }
+      },
+      {
+        "id": "KeywordMatcher-1",
+        "type": "CustomComponent",
+        "position": { "x": 400, "y": 100 },
+        "data": {
+          "id": "KeywordMatcher-1",
+          "type": "CustomComponent",
+          "node": {
+            "display_name": "Reglas Keyword",
+            "code": "KWS = {'phishing': ['phishing','correo sospechoso'],'malware': ['malware','ransomware'],'acceso':['acceso no autorizado'],'credenciales':['contraseña comprometida'],'dispositivo':['usb desconocida']}\nlow = message.lower()\nfor cat, ws in KWS.items():\n    for w in ws:\n        if w in low:\n            return {'is_incident': True, 'category': cat, 'severity': 'P2', 'confidence': 0.85, 'via': 'rule'}\nreturn None"
+          }
+        }
+      },
+      {
+        "id": "Ollama-Class",
+        "type": "Ollama",
+        "position": { "x": 400, "y": 300 },
+        "data": {
+          "id": "Ollama-Class",
+          "type": "Ollama",
+          "node": {
+            "display_name": "LLM Classifier",
+            "model_name": "llama3.2:3b-instruct-q4_K_M",
+            "temperature": 0,
+            "system": "Devuelve SOLO JSON: {\"is_incident\":bool,\"category\":str,\"severity\":\"P1|P2|P3|P4\",\"confidence\":0-1}"
+          }
+        }
+      },
+      {
+        "id": "JSONParser-1",
+        "type": "CustomComponent",
+        "position": { "x": 700, "y": 300 },
+        "data": {
+          "id": "JSONParser-1",
+          "type": "CustomComponent",
+          "node": {
+            "display_name": "Parse JSON",
+            "code": "import json, re\nraw = llm_output\ntry:\n    s = raw[raw.find('{'):raw.rfind('}')+1]\n    data = json.loads(s)\n    return data\nexcept Exception:\n    return {'is_incident': False, 'category': 'otro', 'severity': 'P4', 'confidence': 0.0}"
+          }
+        }
+      },
+      {
+        "id": "Router-1",
+        "type": "ConditionalRouter",
+        "position": { "x": 1000, "y": 200 },
+        "data": {
+          "id": "Router-1",
+          "type": "ConditionalRouter",
+          "node": { "display_name": "Regla > LLM" }
+        }
+      },
+      {
+        "id": "ChatOutput-1",
+        "type": "ChatOutput",
+        "position": { "x": 1300, "y": 200 },
+        "data": { "id": "ChatOutput-1", "type": "ChatOutput", "node": { "display_name": "Clasificación" } }
+      }
+    ],
+    "edges": [
+      { "source": "ChatInput-1", "target": "KeywordMatcher-1" },
+      { "source": "ChatInput-1", "target": "Ollama-Class" },
+      { "source": "Ollama-Class", "target": "JSONParser-1" },
+      { "source": "KeywordMatcher-1", "target": "Router-1" },
+      { "source": "JSONParser-1", "target": "Router-1" },
+      { "source": "Router-1", "target": "ChatOutput-1" }
+    ]
+  }
+}

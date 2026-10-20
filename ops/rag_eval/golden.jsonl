@@ -1,0 +1,3 @@
+{"question": "¿Cuántos caracteres debe tener una contraseña?", "ground_truth": "Mínimo 12 caracteres según la Política de Contraseñas v2.1."}
+{"question": "¿Cómo reporto un correo de phishing?", "ground_truth": "Reenviando el correo a security@empresa.local y creando un ticket."}
+{"question": "¿Puedo conectar una USB personal?", "ground_truth": "No. Solo dispositivos autorizados y cifrados."}

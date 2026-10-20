@@ -1,24 +1,22 @@
-"""Headers de seguridad, sanitización y bloqueo de inputs."""
-from fastapi import Request, HTTPException
+# backend/app/middleware/security.py
+"""Headers de seguridad. NO inspecciona cuerpos JSON (evita falsos positivos)."""
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-import re
 
-SQLI = re.compile(r"(\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b.*\b(FROM|WHERE|INTO)\b)", re.IGNORECASE)
-XSS = re.compile(r"(<script|javascript:|onerror\s*=|onload\s*=)", re.IGNORECASE)
 
 MAX_BODY = 32 * 1024  # 32 KB
 
+
 class SecurityMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Tamaño máximo
         cl = request.headers.get("content-length")
-        if cl and int(cl) > MAX_BODY:
-            raise HTTPException(status_code=413, detail="Payload demasiado grande")
-
-        # Sanitización básica en query params
-        for v in request.query_params.values():
-            if SQLI.search(v) or XSS.search(v):
-                raise HTTPException(status_code=400, detail="Input sospechoso")
+        if cl:
+            try:
+                if int(cl) > MAX_BODY:
+                    from fastapi.responses import JSONResponse
+                    return JSONResponse(status_code=413, content={"error": "payload_too_large"})
+            except ValueError:
+                pass
 
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"

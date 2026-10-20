@@ -1,0 +1,24 @@
+<group name="secbot,">
+  <rule id="100200" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="source">secbot</field>
+    <description>SecBot: evento informativo</description>
+  </rule>
+  <rule id="100201" level="10">
+    <if_sid>100200</if_sid>
+    <field name="event_type">audit.auth.login</field>
+    <field name="data.result">fail</field>
+    <description>SecBot: login fallido</description>
+  </rule>
+  <rule id="100202" level="12">
+    <if_sid>100200</if_sid>
+    <field name="event_type">incident.detected</field>
+    <field name="severity">P1</field>
+    <description>SecBot: incidente crítico P1</description>
+  </rule>
+  <rule id="100203" level="11">
+    <if_sid>100200</if_sid>
+    <field name="event_type">audit.admin.role_permissions_update</field>
+    <description>SecBot: cambio de permisos</description>
+  </rule>
+</group>

@@ -1,81 +1,102 @@
 {
-    "name": "daily-summary",
-    "nodes": [
-        {
-            "parameters": {
-                "rule": {
-                    "interval": [
-                        {
-                            "field": "cronExpression",
-                            "expression": "0 8 * * *"
-                        }
-                    ]
-                }
-            },
-            "name": "Cron 08:00",
-            "type": "n8n-nodes-base.scheduleTrigger",
-            "typeVersion": 1.1,
-            "position": [
-                200,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "url": "http://backend:8000/api/v1/reports/management?months=1",
-                "options": {
-                    "headers": {
-                        "Authorization": "=Bearer {{ $env.REPORT_API_TOKEN }}"
-                    }
-                }
-            },
-            "name": "GET Reporte",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.2,
-            "position": [
-                420,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "fromEmail": "secbot@empresa.local",
-                "toEmail": "security@empresa.local",
-                "subject": "=[SECBOT] Resumen diario {{ $now.format('yyyy-MM-dd') }}",
-                "emailType": "html",
-                "message": "=<h3>Resumen</h3><p>Consultas: {{ $json.total_queries }}</p><p>Incidentes: {{ $json.incidents_reported }}</p><p>Horas ahorradas: {{ $json.hours_saved }}</p><p>Cobertura citas: {{ $json.citation_coverage }}%</p>"
-            },
-            "name": "Email Resumen",
-            "type": "n8n-nodes-base.emailSend",
-            "typeVersion": 2.1,
-            "position": [
-                640,
-                300
-            ]
+  "name": "daily-summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 8 * * 1-5" }] }
+      },
+      "id": "cron",
+      "name": "Cron 08:00 L-V",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/management?months=1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": { "timeout": 20000 }
+      },
+      "id": "http-report",
+      "name": "GET Reporte",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300],
+      "credentials": { "httpHeaderAuth": { "id": "1", "name": "secbot-service-token" } },
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatear HTML de resumen\nconst d = $input.first().json;\nconst top = (d.top_topics || []).slice(0,5).map(t => `<li><b>${t.topic}</b>: ${t.n}</li>`).join('');\nconst incidents = d.incidents_reported || 0;\nconst color = incidents > 10 ? '#b3261e' : incidents > 3 ? '#d97706' : '#1a7f37';\nconst html = `\n<div style=\"font-family:system-ui,Arial,sans-serif;max-width:640px\">\n  <h2 style=\"color:#1f4e79\">Resumen diario SecBot — ${new Date().toISOString().slice(0,10)}</h2>\n  <table cellpadding=\"8\" style=\"border-collapse:collapse\">\n    <tr><td>Consultas totales</td><td><b>${d.total_queries}</b></td></tr>\n    <tr><td>Resueltas sin escalar</td><td><b>${d.resolved_without_escalation}</b></td></tr>\n    <tr><td>Incidentes</td><td><b style=\"color:${color}\">${incidents}</b></td></tr>\n    <tr><td>Latencia p95</td><td><b>${d.p95_latency_ms} ms</b></td></tr>\n    <tr><td>Cobertura citas</td><td><b>${d.citation_coverage}%</b></td></tr>\n    <tr><td>Horas ahorradas</td><td><b>${d.hours_saved}</b></td></tr>\n  </table>\n  <h3>Temas frecuentes</h3>\n  <ul>${top}</ul>\n  <p style=\"color:#666;font-size:12px\">Enviado automáticamente por SecBot.</p>\n</div>`;\nreturn [{ json: { html, metrics: d } }];"
+      },
+      "id": "code-html",
+      "name": "Formatear HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            { "value1": "={{ $json.metrics.p95_latency_ms }}", "operation": "larger", "value2": 5000 }
+          ]
         }
-    ],
-    "connections": {
-        "Cron 08:00": {
-            "main": [
-                [
-                    {
-                        "node": "GET Reporte",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "GET Reporte": {
-            "main": [
-                [
-                    {
-                        "node": "Email Resumen",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        }
+      },
+      "id": "if-slow",
+      "name": "IF Latencia Alta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $env.SECURITY_EMAIL }}",
+        "subject": "=[SECBOT] ⚠️ Alerta latencia p95 {{ $json.metrics.p95_latency_ms }}ms",
+        "emailType": "html",
+        "message": "=<p><b>Latencia p95 excede 5s:</b> {{ $json.metrics.p95_latency_ms }} ms</p><p>Revisar carga de Ollama y caché Redis.</p>"
+      },
+      "id": "email-alert",
+      "name": "Email Alerta",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1080, 220],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $env.SECURITY_EMAIL }}",
+        "subject": "=[SECBOT] Resumen diario {{ $now.format('yyyy-MM-dd') }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}"
+      },
+      "id": "email-summary",
+      "name": "Email Resumen",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1080, 380],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } },
+      "retryOnFail": true,
+      "maxTries": 3
     }
+  ],
+  "connections": {
+    "Cron 08:00 L-V": { "main": [[{ "node": "GET Reporte", "type": "main", "index": 0 }]] },
+    "GET Reporte": { "main": [[{ "node": "Formatear HTML", "type": "main", "index": 0 }]] },
+    "Formatear HTML": { "main": [[{ "node": "IF Latencia Alta", "type": "main", "index": 0 }]] },
+    "IF Latencia Alta": {
+      "main": [
+        [{ "node": "Email Alerta", "type": "main", "index": 0 }],
+        [{ "node": "Email Resumen", "type": "main", "index": 0 }]
+      ]
+    },
+    "Email Alerta": { "main": [[{ "node": "Email Resumen", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "reportes" }]
 }

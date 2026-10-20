@@ -1,14 +1,22 @@
-"""Crea el primer usuario admin.
-Uso: docker compose exec backend python -m scripts.create_admin
-"""
+import sys
+import os
 from app.database import SessionLocal
 from app import models
 from app.auth import hash_password
 
 def main():
-    email = input("Email admin: ").strip()
-    name = input("Nombre completo: ").strip()
-    pwd = input("Password: ").strip()
+    if len(sys.argv) >= 4:
+        email = sys.argv[1].strip()
+        name = sys.argv[2].strip()
+        pwd = sys.argv[3].strip()
+    elif os.getenv("ADMIN_EMAIL") and os.getenv("ADMIN_PASSWORD"):
+        email = os.getenv("ADMIN_EMAIL").strip()
+        name = os.getenv("ADMIN_NAME", "Administrador").strip()
+        pwd = os.getenv("ADMIN_PASSWORD").strip()
+    else:
+        email = input("Email admin: ").strip()
+        name = input("Nombre completo: ").strip()
+        pwd = input("Password: ").strip()
 
     with SessionLocal() as db:
         if db.query(models.User).filter(models.User.email == email).first():

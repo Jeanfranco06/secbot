@@ -1,0 +1,55 @@
+/* ==========================================================================
+   TICKET DETAIL STYLING
+   ========================================================================== */
+
+.ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+  margin-bottom: var(--s-6);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.ticket-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.ticket-number-badge {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-primary);
+  background: var(--c-primary-subtle);
+  border: 1px solid var(--c-primary-border);
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+}
+
+.ticket-desc-box {
+  background: var(--c-bg-subtle);
+  padding: var(--s-4);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-border);
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: var(--c-text);
+}
+
+.ticket-resolution-box {
+  background: var(--c-success-subtle);
+  border: 1px solid var(--c-success-border);
+  padding: var(--s-4);
+  border-radius: var(--r-sm);
+  margin-top: var(--s-4);
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

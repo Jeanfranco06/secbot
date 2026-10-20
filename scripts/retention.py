@@ -1,54 +1,42 @@
-"""Aplicar política de retención.
-Uso: docker compose exec backend python -m scripts.retention
-Cron sugerido: diario 03:00
-"""
+"""Retención diferenciada por jurisdicción por usuario."""
 from datetime import datetime, timedelta
 from sqlalchemy import text
 from app.database import SessionLocal
 
-RETENTION_DAYS = {
-    "chat_history": 365,
-    "chat_messages": 365,
-    "tickets": 730,
-    "audit_log": 1825,
-    "report_exports": 90,
-}
+def _policy(db, j):
+    row = db.execute(text("""
+        SELECT chat_retention_days, ticket_retention_days
+        FROM jurisdiction_policies WHERE id = :j
+    """), {"j": j}).mappings().first()
+    return row or {"chat_retention_days": 365, "ticket_retention_days": 730}
 
 def run():
     with SessionLocal() as db:
         now = datetime.utcnow()
 
-        # Chat: eliminar conversaciones antiguas (cascada borra mensajes)
-        cutoff_chat = now - timedelta(days=RETENTION_DAYS["chat_history"])
-        n_chat = db.execute(text(
-            "DELETE FROM chat_history WHERE started_at < :c"
-        ), {"c": cutoff_chat}).rowcount
+        # Chats por jurisdicción
+        for j in db.execute(text("SELECT id FROM jurisdiction_policies")).scalars():
+            pol = _policy(db, j)
+            cutoff = now - timedelta(days=pol["chat_retention_days"])
+            n = db.execute(text("""
+                DELETE FROM chat_history
+                WHERE started_at < :c
+                  AND user_id IN (SELECT id FROM users WHERE jurisdiction = :j)
+            """), {"c": cutoff, "j": j}).rowcount
+            print(f"[{j}] chats={n}")
 
-        # Tickets cerrados antiguos
-        cutoff_tk = now - timedelta(days=RETENTION_DAYS["tickets"])
-        n_tk = db.execute(text("""
-            DELETE FROM tickets
-            WHERE status IN ('cerrado','cancelado') AND updated_at < :c
-        """), {"c": cutoff_tk}).rowcount
-
-        # Reportes exportados (archivos)
-        import os
-        cutoff_rep = now - timedelta(days=RETENTION_DAYS["report_exports"])
-        rows = db.execute(text("""
-            SELECT id, file_path FROM report_exports WHERE created_at < :c
-        """), {"c": cutoff_rep}).mappings().all()
-        for r in rows:
-            try:
-                if r["file_path"] and os.path.exists(r["file_path"]):
-                    os.remove(r["file_path"])
-            except Exception:
-                pass
-        n_rep = db.execute(text(
-            "DELETE FROM report_exports WHERE created_at < :c"
-        ), {"c": cutoff_rep}).rowcount
+        # Tickets por jurisdicción
+        for j in db.execute(text("SELECT id FROM jurisdiction_policies")).scalars():
+            pol = _policy(db, j)
+            cutoff = now - timedelta(days=pol["ticket_retention_days"])
+            n = db.execute(text("""
+                DELETE FROM tickets
+                WHERE status IN ('cerrado','cancelado') AND updated_at < :c
+                  AND reported_by IN (SELECT id FROM users WHERE jurisdiction = :j)
+            """), {"c": cutoff, "j": j}).rowcount
+            print(f"[{j}] tickets={n}")
 
         db.commit()
-        print(f"[retention] chat={n_chat} tickets={n_tk} reports={n_rep}")
 
 if __name__ == "__main__":
     run()

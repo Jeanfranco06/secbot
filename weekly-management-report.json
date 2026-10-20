@@ -1,0 +1,84 @@
+{
+  "name": "weekly-management-report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }] }
+      },
+      "id": "cron",
+      "name": "Cron Lunes 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/management?months=3",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "http-metrics",
+      "name": "GET Métricas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300],
+      "credentials": { "httpHeaderAuth": { "id": "1", "name": "secbot-service-token" } }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/export?report=management&format=pdf&days=90",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": { "response": { "response": { "responseFormat": "file" } } }
+      },
+      "id": "http-pdf",
+      "name": "GET PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 460],
+      "credentials": { "httpHeaderAuth": { "id": "1", "name": "secbot-service-token" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const m = $input.first().json;\nconst trends = (m.queries_by_day || []).slice(-14);\nconst firstHalf = trends.slice(0, 7).reduce((a,b)=>a+b.count,0);\nconst secondHalf = trends.slice(7).reduce((a,b)=>a+b.count,0);\nconst trend = secondHalf > firstHalf * 1.1 ? '📈 creciente' : secondHalf < firstHalf * 0.9 ? '📉 decreciente' : '➡️ estable';\nreturn [{ json: { m, trend } }];"
+      },
+      "id": "code-trend",
+      "name": "Calcular Tendencia",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $env.MANAGEMENT_EMAIL }}",
+        "subject": "=[SECBOT] Reporte semanal de gestión — {{ $now.format('yyyy-ww') }}",
+        "emailType": "html",
+        "message": "=<h2>Reporte semanal de gestión</h2>\n<p><b>Tendencia de consultas:</b> {{ $json.trend }}</p>\n<table cellpadding=\"6\">\n  <tr><td>Consultas (90d)</td><td><b>{{ $json.m.total_queries }}</b></td></tr>\n  <tr><td>Incidentes (90d)</td><td><b>{{ $json.m.incidents_reported }}</b></td></tr>\n  <tr><td>Horas ahorradas</td><td><b>{{ $json.m.hours_saved }}</b></td></tr>\n  <tr><td>Cobertura citas</td><td><b>{{ $json.m.citation_coverage }}%</b></td></tr>\n</table>\n<p>Se adjunta reporte PDF con el detalle completo.</p>",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              { "property": "data", "inputDataFieldName": "data" }
+            ]
+          }
+        }
+      },
+      "id": "email",
+      "name": "Email Gestión",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [860, 300],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+    }
+  ],
+  "connections": {
+    "Cron Lunes 09:00": { "main": [[{ "node": "GET Métricas", "type": "main", "index": 0 }, { "node": "GET PDF", "type": "main", "index": 1 }]] },
+    "GET Métricas": { "main": [[{ "node": "Calcular Tendencia", "type": "main", "index": 0 }]] },
+    "Calcular Tendencia": { "main": [[{ "node": "Email Gestión", "type": "main", "index": 0 }]] },
+    "GET PDF": { "main": [[{ "node": "Email Gestión", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "reportes" }, { "name": "management" }]
+}

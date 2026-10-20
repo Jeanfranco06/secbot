@@ -1,0 +1,212 @@
+/* ==========================================================================
+   APP SHELL & NAVIGATION HEADER
+   ========================================================================== */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-bg);
+}
+
+.app-header {
+  height: var(--nav-h);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: 0 var(--s-6);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--sh-sm);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.app-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: var(--c-text);
+  font-size: 16px;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.brand-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--c-primary-subtle);
+  color: var(--c-primary);
+  border: 1px solid var(--c-primary-border);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  letter-spacing: 0.05em;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  margin: 0 var(--s-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.app-link {
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--t-fast);
+}
+
+.app-link:hover {
+  background: var(--c-surface-hover);
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.app-link.active {
+  background: var(--c-primary-subtle);
+  color: var(--c-primary);
+  font-weight: 700;
+}
+
+.app-user {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  background: var(--c-bg-subtle);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-full);
+  text-decoration: none;
+  transition: border-color var(--t-fast);
+}
+
+.user-profile-badge:hover {
+  border-color: var(--c-border-subtle);
+}
+
+.user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-primary) 0%, #1e40af 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--c-text);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+}
+
+/* Mobile responsive navigation */
+@media (max-width: 960px) {
+  .app-header {
+    padding: 0 var(--s-4);
+  }
+  
+  .app-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-nav {
+    display: none;
+  }
+
+  .app-nav.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--c-surface);
+    margin: 0;
+    padding: var(--s-5);
+    gap: var(--s-2);
+    border-top: 1px solid var(--c-border);
+    z-index: 99;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .app-nav.open .app-link {
+    padding: 12px var(--s-4);
+    font-size: 15px;
+  }
+
+  .app-user-name {
+    display: none;
+  }
+}

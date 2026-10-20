@@ -1,0 +1,136 @@
+:root {
+  /* ==========================================================================
+     COLOR SYSTEM - LIGHT MODE (Crisp Enterprise)
+     ========================================================================== */
+  --c-bg: #f8fafc;
+  --c-bg-subtle: #f1f5f9;
+  --c-surface: #ffffff;
+  --c-surface-hover: #f8fafc;
+  --c-surface-active: #f1f5f9;
+  --c-border: #e2e8f0;
+  --c-border-subtle: #cbd5e1;
+  --c-border-focus: #3b82f6;
+
+  /* Typography Colors */
+  --c-text: #0f172a;
+  --c-text-secondary: #334155;
+  --c-text-muted: #64748b;
+  --c-text-light: #94a3b8;
+
+  /* Brand / Primary */
+  --c-primary: #2563eb;
+  --c-primary-hover: #1d4ed8;
+  --c-primary-active: #1e40af;
+  --c-primary-subtle: #eff6ff;
+  --c-primary-border: #bfdbfe;
+  --c-primary-fg: #ffffff;
+
+  /* Accents & States */
+  --c-success: #10b981;
+  --c-success-subtle: #ecfdf5;
+  --c-success-border: #a7f3d0;
+  --c-warning: #f59e0b;
+  --c-warning-subtle: #fffbeb;
+  --c-warning-border: #fde68a;
+  --c-danger: #ef4444;
+  --c-danger-hover: #dc2626;
+  --c-danger-subtle: #fef2f2;
+  --c-danger-border: #fecaca;
+  --c-info: #0284c7;
+  --c-info-subtle: #f0f9ff;
+  --c-info-border: #bae6fd;
+
+  /* Severity Tokens */
+  --c-p1: #dc2626;
+  --c-p1-subtle: #fee2e2;
+  --c-p2: #d97706;
+  --c-p2-subtle: #fef3c7;
+  --c-p3: #2563eb;
+  --c-p3-subtle: #dbeafe;
+  --c-p4: #64748b;
+  --c-p4-subtle: #f1f5f9;
+
+  /* Spacing Scale */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+  --s-9: 48px;
+
+  /* Border Radius */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 9999px;
+
+  /* Layered Shadows */
+  --sh-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --sh-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --sh-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --sh-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  --sh-glow: 0 0 25px rgba(37, 99, 235, 0.2);
+
+  /* Typography */
+  --f-base: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Layout Constants */
+  --nav-h: 64px;
+  --sidebar-w: 280px;
+
+  /* Transitions */
+  --t-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --t-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --t-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #090d16;
+    --c-bg-subtle: #0f172a;
+    --c-surface: #111827;
+    --c-surface-hover: #1e293b;
+    --c-surface-active: #243046;
+    --c-border: #1e293b;
+    --c-border-subtle: #334155;
+    --c-border-focus: #60a5fa;
+
+    --c-text: #f8fafc;
+    --c-text-secondary: #cbd5e1;
+    --c-text-muted: #94a3b8;
+    --c-text-light: #64748b;
+
+    --c-primary: #3b82f6;
+    --c-primary-hover: #60a5fa;
+    --c-primary-active: #2563eb;
+    --c-primary-subtle: rgba(59, 130, 246, 0.15);
+    --c-primary-border: rgba(59, 130, 246, 0.3);
+    --c-primary-fg: #ffffff;
+
+    --c-success-subtle: rgba(16, 185, 129, 0.15);
+    --c-success-border: rgba(16, 185, 129, 0.3);
+    --c-warning-subtle: rgba(245, 158, 11, 0.15);
+    --c-warning-border: rgba(245, 158, 11, 0.3);
+    --c-danger-subtle: rgba(239, 68, 68, 0.15);
+    --c-danger-border: rgba(239, 68, 68, 0.3);
+    --c-info-subtle: rgba(2, 132, 199, 0.15);
+    --c-info-border: rgba(2, 132, 199, 0.3);
+
+    --c-p1-subtle: rgba(220, 38, 38, 0.2);
+    --c-p2-subtle: rgba(217, 119, 6, 0.2);
+    --c-p3-subtle: rgba(37, 99, 235, 0.2);
+    --c-p4-subtle: rgba(100, 116, 139, 0.2);
+
+    --sh-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --sh-glow: 0 0 35px rgba(59, 130, 246, 0.25);
+  }
+}

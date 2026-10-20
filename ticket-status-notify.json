@@ -1,0 +1,56 @@
+{
+  "name": "ticket-status-notify",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket-status-changed",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wh",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "ticket-status-changed"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT t.id, t.ticket_number, t.severity, t.status, t.title, t.resolution,\n       u.email AS reporter_email, u.full_name AS reporter_name\nFROM tickets t\nLEFT JOIN users u ON u.id = t.reported_by\nWHERE t.id = '{{ $json.body.ticket_id }}';",
+        "options": {}
+      },
+      "id": "pg-user",
+      "name": "PG Buscar Reportante",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [420, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $json.reporter_email }}",
+        "subject": "=[SECBOT] Tu ticket {{ $json.ticket_number }} cambió a {{ $json.status }}",
+        "emailType": "html",
+        "message": "=<p>Hola {{ $json.reporter_name }},</p>\n<p>El estado de tu ticket <b>{{ $json.ticket_number }}</b> ahora es <b>{{ $json.status }}</b>.</p>\n<p>{{ $json.title }}</p>\n{{ $json.resolution ? '<h4>Resolución</h4><p>' + $json.resolution + '</p>' : '' }}\n<p>Gracias por tu reporte.</p>"
+      },
+      "id": "email",
+      "name": "Email Estado",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [640, 300],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } },
+      "retryOnFail": true,
+      "maxTries": 3
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "PG Buscar Reportante", "type": "main", "index": 0 }]] },
+    "PG Buscar Reportante": { "main": [[{ "node": "Email Estado", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "notificaciones" }]
+}

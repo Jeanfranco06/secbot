@@ -83,3 +83,12 @@ def list_exports(
          "size_bytes": r.size_bytes, "created_at": r.created_at.isoformat()}
         for r in rows
     ]
+
+from app.services import reports
+
+@router.post("/cleanup")
+def cleanup_exports(
+    _: models.User = Depends(require_permissions("report.export")),
+):
+    removed = reports.cleanup_expired()
+    return {"ok": True, "removed": removed}

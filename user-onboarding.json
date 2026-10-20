@@ -1,0 +1,54 @@
+{
+  "name": "user-onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-created",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wh",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "user-created"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, email, full_name FROM users WHERE id = '{{ $json.body.user_id }}';",
+        "options": {}
+      },
+      "id": "pg-user",
+      "name": "PG Buscar",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [420, 300],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "secbot@empresa.local",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=[SECBOT] Bienvenido al asistente de seguridad",
+        "emailType": "html",
+        "message": "=<p>Hola {{ $json.full_name }},</p>\n<p>Ya puedes usar el asistente interno de seguridad en:</p>\n<p><a href=\"{{ $env.SECBOT_BASE_URL }}/chat\">{{ $env.SECBOT_BASE_URL }}/chat</a></p>\n<h3>¿Qué puedo preguntar?</h3>\n<ul>\n  <li>Políticas de contraseñas, VPN, uso de USB</li>\n  <li>Cómo reportar phishing, malware, pérdida de equipo</li>\n  <li>Procedimientos y runbooks de seguridad</li>\n</ul>\n<p>Si detectas un incidente, el asistente creará un ticket automáticamente.</p>"
+      },
+      "id": "email",
+      "name": "Email Bienvenida",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [640, 300],
+      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "PG Buscar", "type": "main", "index": 0 }]] },
+    "PG Buscar": { "main": [[{ "node": "Email Bienvenida", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "onboarding" }]
+}

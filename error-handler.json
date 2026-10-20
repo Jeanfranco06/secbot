@@ -1,0 +1,56 @@
+{
+  "name": "error-handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nconst wf = e.workflow?.name || 'desconocido';\nconst exec = e.execution?.id || 'n/a';\nconst err = e.execution?.error?.message || 'Error sin mensaje';\nconst last = e.execution?.lastNodeExecuted || 'n/a';\nreturn [{ json: { workflow: wf, execution: exec, error: err, node: last, ts: new Date().toISOString() } }];"
+      },
+      "id": "code",
+      "name": "Formatear Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#secbot-alertas", "mode": "name" },
+        "text": "=❌ *Error en workflow* `{{ $json.workflow }}`\nNodo: `{{ $json.node }}`\nError: {{ $json.error }}\nEjecución: {{ $json.execution }}\n[Ver en n8n]({{ $env.N8N_EDITOR_BASE_URL }}/execution/{{ $json.execution }})"
+      },
+      "id": "slack",
+      "name": "Slack Error",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [640, 220],
+      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit_log (module, action, entity, entity_id, result, input)\nVALUES ('n8n', 'workflow_error', 'workflow', '{{ $json.workflow }}', 'fail',\n        jsonb_build_object('execution', '{{ $json.execution }}', 'node', '{{ $json.node }}', 'error', '{{ $json.error.replace(/'/g, \"''\") }}'));",
+        "options": {}
+      },
+      "id": "pg-audit",
+      "name": "PG Auditoría",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [640, 380],
+      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+    }
+  ],
+  "connections": {
+    "Error Trigger": { "main": [[{ "node": "Formatear Error", "type": "main", "index": 0 }]] },
+    "Formatear Error": { "main": [[{ "node": "Slack Error", "type": "main", "index": 0 }, { "node": "PG Auditoría", "type": "main", "index": 1 }]] }
+  },
+  "settings": { "timezone": "America/Lima" },
+  "active": true,
+  "tags": [{ "name": "secbot" }, { "name": "infra" }]
+}

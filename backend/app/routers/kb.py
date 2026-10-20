@@ -7,14 +7,7 @@ from app.database import get_db
 from app.auth import require_permissions
 from app.services.audit import log_action
 from app.ingestion.ingest import ingest_one, ingest_dir, ingest_bytes
-from pathlib import Path
-import shutil
-import tempfile
-
-from app.services import cache
-
-# tras ingest_one exitoso
-cache.invalidate_all()
+from app.services import kb_versioning, cache, notification
 
 router = APIRouter(prefix="/api/v1/kb", tags=["kb"])
 
@@ -46,17 +39,22 @@ async def upload_doc(
     user: models.User = Depends(require_permissions("kb.manage")),
     db: Session = Depends(get_db),
 ):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
-        shutil.copyfileobj(file.file, tmp)
-        tmp_path = tmp.name
+    data = await file.read()
     try:
-        result = ingest_one(tmp_path, title, doc_type, version, owner, section_split, original_name=file.filename)
-    finally:
-        Path(tmp_path).unlink(missing_ok=True)
-
+        result = ingest_bytes(data, file.filename, title, doc_type, version, owner, section_split)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
     log_action(db, user_id=user.id, module="kb", action="upload",
                entity="document", entity_id=result.get("doc_id"),
                input_data={"title": title, "version": version})
+    cache.invalidate_all()
+    try:
+        notification.notify_kb_updated(
+            user=user.email, title=title, version=version,
+            chunks=result.get("chunks", 0), action="upload",
+        )
+    except Exception:
+        pass
     return result
 
 @router.post("/documents/{doc_id}/obsolete")
@@ -87,4 +85,4 @@ def stats(
         FROM kb_documents
     """)).mappings().first()
     chunks = db.execute(text("SELECT COUNT(*) FROM kb_chunks")).scalar()
-    return {"documents": dict(row), "chunks": chunks}
+    return {"documents": dict(row), "chunks": chunks}

@@ -5,8 +5,10 @@
 ops/jwt/private.pem
 
 # Local runtime artifacts
-/dist/
-/dist-widget/
+dist/
+dist-widget/
+**/dist/
+**/dist-widget/
 /backups/
 /exports/
 /logs/
@@ -22,3 +24,5 @@ __pycache__/
 **/.venv/
 **/node_modules/
 **/__pycache__/
+.history/
+**/.history/

@@ -1,0 +1,124 @@
+/* ==========================================================================
+   DASHBOARD - Executive Cybersecurity Cockpit
+   ========================================================================== */
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-6);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.dashboard-title-group h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--c-text);
+  letter-spacing: -0.02em;
+}
+
+.dashboard-title-group p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+/* KPI Cards */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+  border-color: var(--c-primary-border);
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--c-border);
+}
+
+.kpi-card.tone-primary::before { background: var(--c-primary); }
+.kpi-card.tone-success::before { background: var(--c-success); }
+.kpi-card.tone-danger::before  { background: var(--c-danger); }
+.kpi-card.tone-warning::before { background: var(--c-warning); }
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-icon {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.kpi-value {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--c-text);
+}
+
+.kpi-hint {
+  font-size: 12px;
+  color: var(--c-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kpi-success { color: var(--c-success); }
+.kpi-danger  { color: var(--c-danger); }
+.kpi-warning { color: var(--c-warning); }
+
+/* Progress bar inside tables */
+.bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--c-bg-subtle);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-primary) 0%, #60a5fa 100%);
+  border-radius: var(--r-full);
+}
