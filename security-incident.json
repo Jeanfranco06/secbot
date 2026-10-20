@@ -1,0 +1,202 @@
+{
+    "name": "security-incident",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "security-incident",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ],
+            "webhookId": "security-incident"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.headers['x-n8n-secret'] }}",
+                            "operation": "equals",
+                            "value2": "={{ $env.N8N_SECRET }}"
+                        }
+                    ]
+                }
+            },
+            "name": "Validar Secreto",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                420,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "UPDATE tickets SET updated_at = now() WHERE id = '{{ $json.body.ticket_id }}';",
+                "options": {}
+            },
+            "name": "Postgres Update",
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.4,
+            "position": [
+                640,
+                220
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.body.severity }}",
+                            "operation": "regex",
+                            "value2": "^(P1|P2)$"
+                        }
+                    ]
+                }
+            },
+            "name": "IF Urgente",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                860,
+                220
+            ]
+        },
+        {
+            "parameters": {
+                "fromEmail": "secbot@empresa.local",
+                "toEmail": "security@empresa.local",
+                "subject": "=[SECBOT][{{ $json.body.severity }}] {{ $json.body.title }}",
+                "emailType": "html",
+                "message": "=<p><b>Ticket:</b> {{ $json.body.ticket_number }}</p><p><b>Categoría:</b> {{ $json.body.category }}</p><p><b>Reportado por:</b> {{ $json.body.reported_by }}</p>"
+            },
+            "name": "Email Urgente",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [
+                1080,
+                140
+            ]
+        },
+        {
+            "parameters": {
+                "fromEmail": "secbot@empresa.local",
+                "toEmail": "security@empresa.local",
+                "subject": "=[SECBOT][{{ $json.body.severity }}] Nuevo ticket {{ $json.body.ticket_number }}",
+                "emailType": "html",
+                "message": "=<p>Ticket {{ $json.body.ticket_number }} ({{ $json.body.severity }})</p><p>{{ $json.body.title }}</p>"
+            },
+            "name": "Email Normal",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [
+                1080,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={\"ok\": true, \"ticket_id\": \"{{ $json.body.ticket_id }}\"}"
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1300,
+                220
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Validar Secreto",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Validar Secreto": {
+            "main": [
+                [
+                    {
+                        "node": "Postgres Update",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Postgres Update": {
+            "main": [
+                [
+                    {
+                        "node": "IF Urgente",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IF Urgente": {
+            "main": [
+                [
+                    {
+                        "node": "Email Urgente",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Email Normal",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Email Urgente": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Email Normal": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

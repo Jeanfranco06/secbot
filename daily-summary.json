@@ -1,0 +1,81 @@
+{
+    "name": "daily-summary",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 8 * * *"
+                        }
+                    ]
+                }
+            },
+            "name": "Cron 08:00",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://backend:8000/api/v1/reports/management?months=1",
+                "options": {
+                    "headers": {
+                        "Authorization": "=Bearer {{ $env.REPORT_API_TOKEN }}"
+                    }
+                }
+            },
+            "name": "GET Reporte",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                420,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "fromEmail": "secbot@empresa.local",
+                "toEmail": "security@empresa.local",
+                "subject": "=[SECBOT] Resumen diario {{ $now.format('yyyy-MM-dd') }}",
+                "emailType": "html",
+                "message": "=<h3>Resumen</h3><p>Consultas: {{ $json.total_queries }}</p><p>Incidentes: {{ $json.incidents_reported }}</p><p>Horas ahorradas: {{ $json.hours_saved }}</p><p>Cobertura citas: {{ $json.citation_coverage }}%</p>"
+            },
+            "name": "Email Resumen",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [
+                640,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Cron 08:00": {
+            "main": [
+                [
+                    {
+                        "node": "GET Reporte",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "GET Reporte": {
+            "main": [
+                [
+                    {
+                        "node": "Email Resumen",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

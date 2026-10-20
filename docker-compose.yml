@@ -1,0 +1,130 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - max_connections=100
+      - -c
+      - log_min_duration_statement=500
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: [ "redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru" ]
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes: [ ollama:/root/.ollama ]
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - WEBHOOK_URL=https://n8n.empresa.local/
+      - N8N_SECRET=${N8N_SECRET}
+    volumes: [ n8ndata:/home/node/.n8n ]
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET_OLD=${JWT_SECRET_OLD:-}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - LLM_MODEL=${LLM_MODEL}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+      - RERANK_ENABLED=true
+      - CACHE_TTL_SECONDS=300
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/security-incident
+      - N8N_SECRET=${N8N_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
+      - ENV=production
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+      ollama: { condition: service_started }
+    deploy:
+      resources:
+        limits: { cpus: "4.0", memory: 4G }
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports: [ "80:80", "443:443" ]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom_data:/prometheus
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes: [ grafana_data:/var/lib/grafana ]
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:3.1.1
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:3.1.1
+    volumes:
+      - /var/log:/var/log:ro
+      - ./ops/promtail.yml:/etc/promtail/config.yml
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.109.0
+    volumes:
+      - ./ops/otel-collector.yml:/etc/otelcol-contrib/config.yaml
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  ollama:
+  n8ndata:
+  caddy_data:
+  caddy_config:
+  prom_data:
+  grafana_data:

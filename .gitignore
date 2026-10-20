@@ -1,0 +1,24 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+ops/jwt/private.pem
+
+# Local runtime artifacts
+/dist/
+/dist-widget/
+/backups/
+/exports/
+/logs/
+/.venv/
+/node_modules/
+/.pytest_cache/
+/.ruff_cache/
+/.mypy_cache/
+__pycache__/
+*.py[cod]
+
+# Nested environments and dependency caches
+**/.venv/
+**/node_modules/
+**/__pycache__/

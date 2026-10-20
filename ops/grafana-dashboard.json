@@ -1,0 +1,43 @@
+{
+    "title": "SecBot",
+    "panels": [
+        {
+            "type": "timeseries",
+            "title": "Latencia p95 chat",
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, rate(secbot_chat_latency_seconds_bucket[5m]))"
+                }
+            ]
+        },
+        {
+            "type": "stat",
+            "title": "Incidentes últimas 24h",
+            "targets": [
+                {
+                    "expr": "sum(increase(secbot_incidents_total[24h]))"
+                }
+            ]
+        },
+        {
+            "type": "timeseries",
+            "title": "Requests por endpoint",
+            "targets": [
+                {
+                    "expr": "sum by (endpoint) (rate(secbot_requests_total[5m]))"
+                }
+            ]
+        },
+        {
+            "type": "stat",
+            "title": "Cache hit ratio",
+            "targets": [
+                {
+                    "expr": "sum(rate(secbot_cache_hits_total[5m])) / (sum(rate(secbot_cache_hits_total[5m])) + sum(rate(secbot_cache_misses_total[5m])))"
+                }
+            ]
+        }
+    ],
+    "schemaVersion": 39,
+    "version": 1
+}

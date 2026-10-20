@@ -1,0 +1,14 @@
+secbot.empresa.local {
+    reverse_proxy frontend:80
+    tls interno@empresa.local
+}
+
+api.secbot.empresa.local {
+    reverse_proxy backend:8000
+    tls interno@empresa.local
+}
+
+n8n.empresa.local {
+    reverse_proxy n8n:5678
+    tls interno@empresa.local
+}
