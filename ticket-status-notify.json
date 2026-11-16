@@ -12,7 +12,10 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [200, 300],
+      "position": [
+        200,
+        300
+      ],
       "webhookId": "ticket-status-changed"
     },
     {
@@ -25,32 +28,75 @@
       "name": "PG Buscar Reportante",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
-      "position": [420, 300],
-      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "q3fVOjv3iIFfWdp0",
+          "name": "secbot-db"
+        }
+      }
     },
     {
       "parameters": {
-        "fromEmail": "secbot@empresa.local",
-        "toEmail": "={{ $json.reporter_email }}",
+        "fromEmail": "={{ $env.SMTP_FROM || 'jean20francisco06@gmail.com' }}",
+        "toEmail": "={{ ($json.reporter_email && !$json.reporter_email.endsWith('.local') && !$json.reporter_email.endsWith('.test')) ? $json.reporter_email : ($env.SECURITY_EMAIL || 'jean20francisco06@gmail.com') }}",
         "subject": "=[SECBOT] Tu ticket {{ $json.ticket_number }} cambió a {{ $json.status }}",
-        "emailType": "html",
-        "message": "=<p>Hola {{ $json.reporter_name }},</p>\n<p>El estado de tu ticket <b>{{ $json.ticket_number }}</b> ahora es <b>{{ $json.status }}</b>.</p>\n<p>{{ $json.title }}</p>\n{{ $json.resolution ? '<h4>Resolución</h4><p>' + $json.resolution + '</p>' : '' }}\n<p>Gracias por tu reporte.</p>"
+        "html": "<div style=\"background-color:#f1f5f9;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;\">\n  <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.08);border:1px solid #e2e8f0;\">\n    <tr>\n      <td style=\"background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:26px 32px;border-bottom:3px solid #10b981;\">\n        <span style=\"font-size:11px;font-weight:700;letter-spacing:1px;color:#a7f3d0;text-transform:uppercase;\">SECBOT NOTIFICACIONES • CENTRO DE SOPORTE</span>\n        <h1 style=\"margin:6px 0 0;font-size:20px;font-weight:800;color:#ffffff;\">Actualización de tu Reporte</h1>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"padding:28px 32px;\">\n        <p style=\"margin:0 0 18px;font-size:15px;color:#334155;line-height:1.5;\">\n          Hola <b>{{ $json.reporter_name }}</b>, el equipo de ciberseguridad ha actualizado el estado de tu reporte:\n        </p>\n        <table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:20px;font-size:13.5px;\">\n          <tr>\n            <td width=\"30%\" style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Ticket</td>\n            <td style=\"color:#0f172a;font-weight:700;font-family:monospace;border-bottom:1px solid #e2e8f0;\">{{ $json.ticket_number }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Título</td>\n            <td style=\"color:#0f172a;border-bottom:1px solid #e2e8f0;\">{{ $json.title }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Nuevo Estado</td>\n            <td style=\"border-bottom:1px solid #e2e8f0;\">\n              <span style=\"display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;background-color:#d1fae5;color:#065f46;text-transform:uppercase;\">\n                {{ $json.status }}\n              </span>\n            </td>\n          </tr>\n          {{ $json.resolution ? '<tr><td style=\"color:#64748b;font-weight:600;\">Resolución / Notas</td><td style=\"color:#0f172a;line-height:1.5;\">' + $json.resolution + '</td></tr>' : '' }}\n        </table>\n        <div style=\"text-align:center;margin:24px 0 10px;\">\n          <a href=\"http://localhost:3000/tickets/{{ $json.id }}\" style=\"display:inline-block;background-color:#10b981;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;box-shadow:0 2px 4px rgba(16,185,129,0.3);\">\n            Ver Historial Completo del Ticket →\n          </a>\n        </div>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"background-color:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;line-height:1.5;\">\n        Gracias por contribuir a mantener la seguridad de nuestra infraestructura.\n      </td>\n    </tr>\n  </table>\n</div>",
+        "emailFormat": "html",
+        "options": {
+          "appendAttribution": false
+        }
       },
       "id": "email",
       "name": "Email Estado",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [640, 300],
-      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } },
+      "position": [
+        640,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "HZxABrVSHtvU1Pk9",
+          "name": "secbot-smtp"
+        }
+      },
       "retryOnFail": true,
       "maxTries": 3
     }
   ],
   "connections": {
-    "Webhook": { "main": [[{ "node": "PG Buscar Reportante", "type": "main", "index": 0 }]] },
-    "PG Buscar Reportante": { "main": [[{ "node": "Email Estado", "type": "main", "index": 0 }]] }
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "PG Buscar Reportante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Buscar Reportante": {
+      "main": [
+        [
+          {
+            "node": "Email Estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "timezone": "America/Lima"
+  },
   "active": true,
-  "tags": [{ "name": "secbot" }, { "name": "notificaciones" }]
+  "tags": [],
+  "id": "secbot-wf-08"
 }

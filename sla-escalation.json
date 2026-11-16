@@ -3,13 +3,40 @@
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "cronExpression", "expression": "*/15 * * * *" }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/15 * * * *"
+            }
+          ]
+        }
       },
       "id": "cron",
       "name": "Cron cada 15 min",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [200, 300]
+      "position": [
+        200,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sla-escalation-run",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wh-sla-run",
+      "name": "Webhook Manual Run",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        420
+      ],
+      "webhookId": "sla-escalation-run"
     },
     {
       "parameters": {
@@ -21,24 +48,38 @@
       "name": "PG Tickets Vencidos",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
-      "position": [420, 300],
-      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "q3fVOjv3iIFfWdp0",
+          "name": "secbot-db"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map(({ json }) => ({ json }));"
+        "jsCode": "return $input.all().map((item, index) => ({ json: item.json, pairedItem: { item: index } }));"
       },
       "id": "split",
       "name": "Split",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 300]
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
           "string": [
-            { "value1": "={{ $json.severity }}", "value2": "P1" }
+            {
+              "value1": "={{ $json.severity }}",
+              "value2": "P1"
+            }
           ]
         }
       },
@@ -46,64 +87,168 @@
       "name": "IF P1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [860, 300]
+      "position": [
+        860,
+        300
+      ]
     },
     {
       "parameters": {
         "select": "channel",
-        "channelId": { "__rl": true, "value": "#seguridad-critico", "mode": "name" },
+        "channelId": {
+          "__rl": true,
+          "value": "#seguridad-critico",
+          "mode": "name"
+        },
         "text": "=🔴 *ESCALADO P1 — {{ $json.ticket_number }}*\n{{ $json.title }}\nVencido hace {{ Math.floor($json.hours_overdue) }}h\n<a href=\"https://secbot.empresa.local/tickets/{{ $json.id }}\">Atender ahora</a>"
       },
       "id": "slack-p1",
       "name": "Slack Escalado P1",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
-      "position": [1080, 220],
-      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+      "position": [
+        1080,
+        220
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "1",
+          "name": "secbot-slack"
+        }
+      },
+      "disabled": true
     },
     {
       "parameters": {
-        "fromEmail": "secbot@empresa.local",
+        "fromEmail": "={{ $env.SMTP_FROM || 'jean20francisco06@gmail.com' }}",
         "toEmail": "={{ $env.SECURITY_EMAIL }}",
-        "subject": "=[SECBOT][ESCALADO] {{ $json.ticket_number }} vencido",
-        "emailType": "html",
-        "message": "=<p>Ticket <b>{{ $json.ticket_number }}</b> ({{ $json.severity }}) vencido hace {{ Math.floor($json.hours_overdue) }}h.</p><p>{{ $json.title }}</p>"
+        "subject": "=[SECBOT][ESCALADO] {{ $('Split').first().json.ticket_number }} vencido",
+        "html": "<div style=\"background-color:#f1f5f9;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;\">\n  <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.08);border:1px solid #e2e8f0;\">\n    <tr>\n      <td style=\"background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 100%);padding:26px 32px;border-bottom:3px solid #f59e0b;\">\n        <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n          <tr>\n            <td>\n              <span style=\"font-size:11px;font-weight:700;letter-spacing:1px;color:#fecaca;text-transform:uppercase;\">SECBOT SLA MONITOR • ESCALAMIENTO</span>\n              <h1 style=\"margin:6px 0 0;font-size:20px;font-weight:800;color:#ffffff;\">Alerta: Ticket Fuera de SLA</h1>\n            </td>\n            <td align=\"right\" valign=\"middle\">\n              <span style=\"display:inline-block;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:800;background-color:#f59e0b;color:#0f172a;font-family:monospace;\">\n                {{ $('Split').first().json.severity }}\n              </span>\n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"padding:28px 32px;\">\n        <p style=\"margin:0 0 18px;font-size:15px;color:#334155;line-height:1.5;\">\n          El siguiente ticket de seguridad ha superado el tiempo máximo de atención permitido y ha sido <b>escalado automáticamente</b> al equipo de guardia del SOC.\n        </p>\n        <table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:20px;font-size:13.5px;\">\n          <tr>\n            <td width=\"32%\" style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Ticket Afectado</td>\n            <td style=\"color:#0f172a;font-weight:700;font-family:monospace;border-bottom:1px solid #e2e8f0;\">{{ $('Split').first().json.ticket_number }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Título</td>\n            <td style=\"color:#0f172a;font-weight:600;border-bottom:1px solid #e2e8f0;\">{{ $('Split').first().json.title }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Tiempo Vencido</td>\n            <td style=\"color:#b91c1c;font-weight:700;border-bottom:1px solid #e2e8f0;\">{{ Math.floor($('Split').first().json.hours_overdue) }} horas fuera de plazo</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;\">Acción Tomada</td>\n            <td style=\"color:#0f172a;font-weight:600;\">Estado marcado como 'escalated' en PostgreSQL y alertado al SOC</td>\n          </tr>\n        </table>\n        <div style=\"text-align:center;margin:24px 0 10px;\">\n          <a href=\"http://localhost:3000/tickets/{{ $('Split').first().json.id }}\" style=\"display:inline-block;background-color:#dc2626;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;box-shadow:0 2px 4px rgba(220,38,38,0.3);\">\n            Intervenir Ticket Ahora →\n          </a>\n        </div>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"background-color:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;line-height:1.5;\">\n        SecBot Service Level Agreement Engine • Monitoreo continuo de cumplimiento operacional.\n      </td>\n    </tr>\n  </table>\n</div>",
+        "emailFormat": "html",
+        "options": {
+          "appendAttribution": false
+        }
       },
       "id": "email",
       "name": "Email Escalado",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1080, 380],
-      "credentials": { "smtp": { "id": "1", "name": "secbot-smtp" } }
+      "position": [
+        1080,
+        380
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "HZxABrVSHtvU1Pk9",
+          "name": "secbot-smtp"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE tickets\nSET metadata = COALESCE(metadata, '{}'::jsonb)\n  || jsonb_build_object('escalated', true, 'escalated_at', now()::text)\nWHERE id = '{{ $json.id }}';\n\nINSERT INTO audit_log (module, action, entity, entity_id, result, input)\nVALUES ('n8n', 'sla_escalation', 'ticket', '{{ $json.id }}', 'ok',\n        jsonb_build_object('hours_overdue', {{ $json.hours_overdue }}));",
+        "query": "UPDATE tickets\nSET metadata = COALESCE(metadata, '{}'::jsonb)\n  || jsonb_build_object('escalated', true, 'escalated_at', now()::text)\nWHERE id = '{{ $('Split').item.json.id }}';\n\nINSERT INTO audit_log (module, action, entity, entity_id, result, input)\nVALUES ('n8n', 'sla_escalation', 'ticket', '{{ $('Split').item.json.id }}', 'ok',\n        jsonb_build_object('hours_overdue', {{ $('Split').item.json.hours_overdue }}));",
         "options": {}
       },
       "id": "pg-mark",
       "name": "PG Marcar Escalado",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
-      "position": [1300, 300],
-      "credentials": { "postgres": { "id": "1", "name": "secbot-db" } }
+      "position": [
+        1300,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "q3fVOjv3iIFfWdp0",
+          "name": "secbot-db"
+        }
+      }
     }
   ],
   "connections": {
-    "Cron cada 15 min": { "main": [[{ "node": "PG Tickets Vencidos", "type": "main", "index": 0 }]] },
-    "PG Tickets Vencidos": { "main": [[{ "node": "Split", "type": "main", "index": 0 }]] },
-    "Split": { "main": [[{ "node": "IF P1", "type": "main", "index": 0 }]] },
-    "IF P1": {
+    "Cron cada 15 min": {
       "main": [
-        [{ "node": "Slack Escalado P1", "type": "main", "index": 0 }],
-        [{ "node": "Email Escalado", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "PG Tickets Vencidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Slack Escalado P1": { "main": [[{ "node": "PG Marcar Escalado", "type": "main", "index": 0 }]] },
-    "Email Escalado": { "main": [[{ "node": "PG Marcar Escalado", "type": "main", "index": 0 }]] }
+    "Webhook Manual Run": {
+      "main": [
+        [
+          {
+            "node": "PG Tickets Vencidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PG Tickets Vencidos": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "IF P1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF P1": {
+      "main": [
+        [
+          {
+            "node": "Email Escalado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Escalado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Escalado": {
+      "main": [
+        [
+          {
+            "node": "PG Marcar Escalado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "timezone": "America/Lima",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
   "active": true,
-  "tags": [{ "name": "secbot" }, { "name": "sla" }]
+  "tags": [],
+  "id": "secbot-wf-07"
 }

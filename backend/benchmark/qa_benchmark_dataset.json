@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q-nist-01",
+    "query": "What are the primary actions required during the containment phase of an incident?",
+    "target_doc": "NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide",
+    "target_section": "Section 4: Incident Handling Methodology - Phase 2: Containment Strategies",
+    "is_grounded": true,
+    "category": "nist_incident_handling"
+  },
+  {
+    "id": "q-nist-02",
+    "query": "What is the definition of an information security incident according to NIST?",
+    "target_doc": "NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide",
+    "target_section": "Section 1: Introduction and Incident Management Framework",
+    "is_grounded": true,
+    "category": "nist_incident_handling"
+  },
+  {
+    "id": "q-nist-03",
+    "query": "What are key Indicators of Compromise (IoCs) to look for during incident analysis?",
+    "target_doc": "NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide",
+    "target_section": "Section 3: Incident Handling Methodology - Phase 1: Detection and Analysis",
+    "is_grounded": true,
+    "category": "nist_incident_handling"
+  },
+  {
+    "id": "q-nist-04",
+    "query": "How quickly should a lessons-learned meeting be held following incident closure?",
+    "target_doc": "NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide",
+    "target_section": "Section 6: Phase 4: Post-Incident Activity and Lessons Learned",
+    "is_grounded": true,
+    "category": "nist_incident_handling"
+  },
+  {
+    "id": "q-nist-05",
+    "query": "What steps are required to eradicate persistence mechanisms from compromised hosts?",
+    "target_doc": "NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide",
+    "target_section": "Section 5: Incident Handling Methodology - Phase 3: Eradication and Recovery",
+    "is_grounded": true,
+    "category": "nist_incident_handling"
+  },
+  {
+    "id": "q-cis-01",
+    "query": "What are the remediation timeframes for critical CVEs exploited in the wild?",
+    "target_doc": "CIS Critical Security Controls v8: Enterprise Implementation Playbook",
+    "target_section": "Section 4: Continuous Vulnerability Management and Patching",
+    "is_grounded": true,
+    "category": "cis_controls"
+  },
+  {
+    "id": "q-cis-02",
+    "query": "How long must audit logs be retained in online hot search and cold preservation?",
+    "target_doc": "CIS Critical Security Controls v8: Enterprise Implementation Playbook",
+    "target_section": "Section 5: Audit Log Management and Immutable Retention",
+    "is_grounded": true,
+    "category": "cis_controls"
+  },
+  {
+    "id": "q-cis-03",
+    "query": "What are the account deactivation rules for inactive employee accounts?",
+    "target_doc": "CIS Critical Security Controls v8: Enterprise Implementation Playbook",
+    "target_section": "Section 2: Account Management and Credential Lifecycle",
+    "is_grounded": true,
+    "category": "cis_controls"
+  },
+  {
+    "id": "q-cis-04",
+    "query": "What cryptographic encryption standard is mandated for enterprise laptop hard drives?",
+    "target_doc": "CIS Critical Security Controls v8: Enterprise Implementation Playbook",
+    "target_section": "Section 3: Data Protection and Sensitive Asset Isolation",
+    "is_grounded": true,
+    "category": "cis_controls"
+  },
+  {
+    "id": "q-cis-05",
+    "query": "How are unmonitored devices detected within network ports according to asset control?",
+    "target_doc": "CIS Critical Security Controls v8: Enterprise Implementation Playbook",
+    "target_section": "Section 1: Inventory and Control of Enterprise Assets",
+    "is_grounded": true,
+    "category": "cis_controls"
+  },
+  {
+    "id": "q-sec-01",
+    "query": "¿Cuántos caracteres mínimos debe tener una contraseña para usuarios estándar?",
+    "target_doc": "Política de Contraseñas",
+    "target_section": "2. Requisitos de Longitud y Complejidad",
+    "is_grounded": true,
+    "category": "internal_policy"
+  },
+  {
+    "id": "q-sec-02",
+    "query": "¿Qué procedimiento debo seguir inmediatamente si pierdo mi laptop corporativa?",
+    "target_doc": "Runbook de Pérdida de Portátil",
+    "target_section": "2. Procedimiento Inmediato de Contención",
+    "is_grounded": true,
+    "category": "internal_policy"
+  },
+  {
+    "id": "q-sec-03",
+    "query": "¿Cuáles son los requisitos de bloqueo de pantalla automático por inactividad?",
+    "target_doc": "Política de Uso Aceptable",
+    "target_section": "4. Estaciones de Trabajo y Bloqueo",
+    "is_grounded": true,
+    "category": "internal_policy"
+  },
+  {
+    "id": "q-sec-04",
+    "query": "¿Cómo se reporta un correo sospechoso de phishing al equipo SOC?",
+    "target_doc": "Runbook de Respuesta ante Phishing",
+    "target_section": "1. Detección y Notificación Inicial",
+    "is_grounded": true,
+    "category": "internal_policy"
+  },
+  {
+    "id": "q-sec-05",
+    "query": "¿Está permitido conectar dispositivos USB personales a los equipos de la empresa?",
+    "target_doc": "Política de Dispositivos Móviles",
+    "target_section": "3. Medios Extraíbles y Almacenamiento",
+    "is_grounded": true,
+    "category": "internal_policy"
+  },
+  {
+    "id": "q-ood-01",
+    "query": "¿Cuál es la política corporativa para reembolso de pasajes aéreos en vuelos internacionales?",
+    "target_doc": null,
+    "target_section": null,
+    "is_grounded": false,
+    "category": "out_of_domain"
+  },
+  {
+    "id": "q-ood-02",
+    "query": "¿Cuál es la tasa de interés anual aplicada a los préstamos de personal?",
+    "target_doc": null,
+    "target_section": null,
+    "is_grounded": false,
+    "category": "out_of_domain"
+  },
+  {
+    "id": "q-ood-03",
+    "query": "¿Cómo se solicita un cambio de horario para el turno nocturno de producción?",
+    "target_doc": null,
+    "target_section": null,
+    "is_grounded": false,
+    "category": "out_of_domain"
+  },
+  {
+    "id": "q-ood-04",
+    "query": "¿Cuál es el menú del comedor para los días viernes de fin de mes?",
+    "target_doc": null,
+    "target_section": null,
+    "is_grounded": false,
+    "category": "out_of_domain"
+  },
+  {
+    "id": "q-ood-05",
+    "query": "¿Cuántos días de vacaciones acumuladas se pueden vender según recursos humanos?",
+    "target_doc": null,
+    "target_section": null,
+    "is_grounded": false,
+    "category": "out_of_domain"
+  }
+]

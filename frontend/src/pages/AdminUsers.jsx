@@ -193,7 +193,7 @@ export default function AdminUsers() {
           label="Nombre Completo"
           placeholder="Ej: Laura Martínez"
           value={form.full_name}
-          onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+          onChange={(e) => setForm((prev) => ({ ...prev, full_name: e.target.value }))}
         />
         <Input
           label="Email Corporativo"
@@ -201,7 +201,7 @@ export default function AdminUsers() {
           placeholder="laura@empresa.com"
           required
           value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
         />
         <Input
           label="Contraseña Inicial"
@@ -209,7 +209,7 @@ export default function AdminUsers() {
           placeholder="••••••••••••"
           required
           value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
         />
 
         <div className="field">
@@ -255,7 +255,7 @@ export default function AdminUsers() {
             <Input
               label="Nombre Completo"
               value={edit.full_name || ""}
-              onChange={(e) => setEdit({ ...edit, full_name: e.target.value })}
+              onChange={(e) => setEdit((prev) => ({ ...prev, full_name: e.target.value }))}
             />
 
             <div className="field">
@@ -263,7 +263,7 @@ export default function AdminUsers() {
                 <input
                   type="checkbox"
                   checked={edit.is_active}
-                  onChange={(e) => setEdit({ ...edit, is_active: e.target.checked })}
+                  onChange={(e) => setEdit((prev) => ({ ...prev, is_active: e.target.checked }))}
                 />
                 Usuario Activo
               </label>
@@ -281,7 +281,7 @@ export default function AdminUsers() {
                         const next = e.target.checked
                           ? [...(edit.roles || []), r.name]
                           : (edit.roles || []).filter((x) => x !== r.name);
-                        setEdit({ ...edit, roles: next });
+                        setEdit((prev) => ({ ...prev, roles: next }));
                       }}
                     />
                     {r.name}

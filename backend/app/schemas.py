@@ -1,9 +1,12 @@
 """Schemas Pydantic v2 consolidados."""
 from datetime import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
+
+# Permite dominios corporativos internos (.local, .lan, .corp) además de dominios públicos
+EmailStr = Annotated[str, Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$", max_length=254)]
 
 
 # --- Auth ---
@@ -161,6 +164,7 @@ class DashboardSummary(BaseModel):
     resolved_without_escalation: int
     incidents_reported: int
     escalation_rate: float
+    resolution_rate: Optional[float] = 100.0
     avg_latency_ms: float
     p95_latency_ms: float
     citation_coverage: float
@@ -169,6 +173,9 @@ class DashboardSummary(BaseModel):
     tickets_by_status: dict
     tickets_by_severity: dict
     queries_by_day: List[dict]
+    active_kb_docs: Optional[int] = 0
+    sla_breached: Optional[int] = 0
+    recent_incidents: Optional[List[dict]] = []
 
 
 # --- Sesiones ---

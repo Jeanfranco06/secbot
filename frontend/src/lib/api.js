@@ -102,6 +102,7 @@ export const chatApi = {
   chat: (id) => api.get(`/api/v1/chat/history/${id}`).then((r) => r.data),
   feedback: (message_id, rating, comment) =>
     api.post("/api/v1/chat/feedback", { message_id, rating, comment }).then((r) => r.data),
+  analyzeEmail: (payload) => api.post("/api/v1/chat/analyze-email", payload).then((r) => r.data),
 };
 
 export const ticketsApi = {
@@ -109,6 +110,11 @@ export const ticketsApi = {
   get: (id) => api.get(`/api/v1/tickets/${id}`).then((r) => r.data),
   update: (id, patch) => api.patch(`/api/v1/tickets/${id}`, patch).then((r) => r.data),
   label: (id, payload) => api.post(`/api/v1/tickets/${id}/label`, payload).then((r) => r.data),
+  remediationPlan: (id, applyToResolution = false) =>
+    api.post(`/api/v1/tickets/${id}/remediation-plan`, null, { params: { apply_to_resolution: applyToResolution } }).then((r) => r.data),
+  iocs: (id) => api.get(`/api/v1/tickets/${id}/iocs`).then((r) => r.data),
+  alerts: () => api.get("/api/v1/tickets/active-alerts").then((r) => r.data),
+  claim: (id) => api.post(`/api/v1/tickets/${id}/claim`).then((r) => r.data),
 };
 
 export const adminApi = {
@@ -143,12 +149,26 @@ export const reportsApi = {
     return res.data;
   },
   exports: () => api.get("/api/v1/reports/exports").then((r) => r.data),
+  benchmark: () => api.get("/api/v1/reports/benchmark").then((r) => r.data),
 };
 
 export const kbApi = {
   documents: (status) =>
     api.get("/api/v1/kb/documents", { params: status ? { status } : {} }).then((r) => r.data),
   stats: () => api.get("/api/v1/kb/stats").then((r) => r.data),
+  get: (id) => api.get(`/api/v1/kb/documents/${id}`).then((r) => r.data),
+  download: async (id, format = null) => {
+    const params = format ? { format } : {};
+    const res = await api.get(`/api/v1/kb/documents/${id}/download`, {
+      params,
+      responseType: "blob",
+    });
+    const disposition = res.headers["content-disposition"] || "";
+    let filename = format === "pdf" ? "documento.pdf" : format === "docx" ? "documento.docx" : "documento.md";
+    const match = disposition.match(/filename=["']?([^"';]+)["']?/);
+    if (match && match[1]) filename = match[1];
+    return { data: res.data, filename };
+  },
   upload: (formData) =>
     api.post("/api/v1/kb/documents/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -163,6 +183,7 @@ export const sessionsApi = {
 
 export const complianceApi = {
   evidence: () => api.get("/api/v1/compliance/evidence").then((r) => r.data),
+  gapAnalysis: () => api.get("/api/v1/compliance/gap-analysis").then((r) => r.data),
 };
 
 export const healthApi = {

@@ -20,6 +20,25 @@ def operational(
     ini = fin - timedelta(days=days)
     return metrics.summary(ini, fin)
 
+@router.get("/benchmark")
+def get_benchmark_results(
+    _: models.User = Depends(require_permissions("report.export")),
+):
+    import json
+    bench_paths = [
+        "/app/benchmark/final_benchmark_results.json",
+        "docs/research/benchmark/final_benchmark_results.json",
+        "/app/docs/research/benchmark/final_benchmark_results.json"
+    ]
+    for p in bench_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+    return {"status": "not_found", "message": "Benchmark results not yet generated."}
+
 @router.get("/management")
 def management(
     months: int = Query(6, ge=1, le=24),

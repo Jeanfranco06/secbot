@@ -7,7 +7,7 @@ from app import models, schemas
 from app.database import get_db
 from app.auth import get_current_user
 from app.config import settings
-from app.services import rag, classifier, tickets, pii, prompt_guard, notification
+from app.services import rag, classifier, tickets, pii, prompt_guard, notification, phishing_analyzer
 from app.services.audit import log_action
 from app.ratelimit import limit_chat
 from app import observability
@@ -50,9 +50,17 @@ async def send_message(
     # RAG
     rag_result = rag.answer(msg)
 
-    # Clasificación
+    # Clasificación y tema
     cls = classifier.classify(msg)
     is_incident = cls["is_incident"] and cls["confidence"] >= settings.incident_confidence_threshold
+    topic = classifier.infer_topic(
+        msg,
+        citations=rag_result.get("citations"),
+        incident_category=cls["category"] if is_incident else None,
+    )
+    user_msg.intent = topic
+    db.add(user_msg)
+    db.commit()
 
     ticket_id = None
     if is_incident:
@@ -92,7 +100,7 @@ async def send_message(
     assistant_msg = models.ChatMessage(
         chat_id=chat.id, role="assistant", content=answer_text,
         citations=rag_result["citations"],
-        intent=cls["category"] if is_incident else "consulta",
+        intent=topic,
         confidence=cls["confidence"],
         latency_ms=rag_result["latency_ms"],
         cached=rag_result.get("cached", False),
@@ -160,3 +168,22 @@ def get_chat(
             for m in msgs
         ],
     }
+
+
+class EmailAnalysisPayload(schemas.BaseModel):
+    sender: str = ""
+    subject: str = ""
+    body: str = ""
+
+
+@router.post("/analyze-email")
+def analyze_suspicious_email(
+    payload: EmailAnalysisPayload,
+    user: models.User = Depends(get_current_user),
+):
+    """Analiza heurísticamente un correo sospechoso detectando vectores de phishing y suplantación."""
+    return phishing_analyzer.analyze_email(
+        sender=payload.sender,
+        subject=payload.subject,
+        body=payload.body,
+    )

@@ -1,0 +1,180 @@
+{
+  "name": "weekly-management-report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "cron",
+      "name": "Cron Lunes 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/management?months=3",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "http-metrics",
+      "name": "GET M\u00e9tricas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "EiFn9YNuBJL7EfGH",
+          "name": "secbot-service-token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/export?report=management&format=pdf&days=90",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "http-pdf",
+      "name": "GET PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        460
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "EiFn9YNuBJL7EfGH",
+          "name": "secbot-service-token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const m = $input.first().json;\nconst trends = (m.queries_by_day || []).slice(-14);\nconst firstHalf = trends.slice(0, 7).reduce((a,b)=>a+b.count,0);\nconst secondHalf = trends.slice(7).reduce((a,b)=>a+b.count,0);\nconst trend = secondHalf > firstHalf * 1.1 ? '\ud83d\udcc8 creciente' : secondHalf < firstHalf * 0.9 ? '\ud83d\udcc9 decreciente' : '\u27a1\ufe0f estable';\nreturn [{ json: { m, trend } }];"
+      },
+      "id": "code-trend",
+      "name": "Calcular Tendencia",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.SMTP_FROM || 'jean20francisco06@gmail.com' }}",
+        "toEmail": "={{ $env.MANAGEMENT_EMAIL }}",
+        "subject": "=[SECBOT] Reporte semanal de gesti\u00f3n \u2014 {{ $now.format('yyyy-ww') }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data",
+                "inputDataFieldName": "data"
+              }
+            ]
+          },
+          "appendAttribution": false
+        },
+        "html": "=<div style=\"background-color:#f1f5f9;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;\">\n  <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width:640px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.08);border:1px solid #e2e8f0;\">\n    <tr>\n      <td style=\"background:linear-gradient(135deg,#0f172a 0%,#312e81 100%);padding:26px 32px;border-bottom:3px solid #6366f1;\">\n        <span style=\"font-size:11px;font-weight:700;letter-spacing:1px;color:#c7d2fe;text-transform:uppercase;\">INFORME SEMANAL EJECUTIVO \u2022 CIBERSEGURIDAD</span>\n        <h1 style=\"margin:6px 0 0;font-size:20px;font-weight:800;color:#ffffff;\">Reporte Semanal de Gesti\u00f3n</h1>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"padding:28px 32px;\">\n        <p style=\"margin:0 0 18px;font-size:14.5px;color:#334155;line-height:1.5;\">\n          Estimada Direcci\u00f3n de Tecnolog\u00eda y Seguridad: Se presenta el resumen semanal de operaciones y cumplimiento. <b>Tendencia de consultas:</b> {{ $json.trend }}.\n        </p>\n        <table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:20px;font-size:13.5px;\">\n          <tr>\n            <td width=\"50%\" style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Consultas Trimestre (90d)</td>\n            <td style=\"color:#0f172a;font-weight:800;font-family:monospace;border-bottom:1px solid #e2e8f0;\">{{ $json.m.total_queries }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Incidentes Registrados</td>\n            <td style=\"color:#0f172a;font-weight:800;border-bottom:1px solid #e2e8f0;\">{{ $json.m.incidents_reported }}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Horas Hombre Ahorradas</td>\n            <td style=\"color:#4f46e5;font-weight:800;border-bottom:1px solid #e2e8f0;\">{{ $json.m.hours_saved }} h</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;\">Cobertura Normativa con Citas</td>\n            <td style=\"color:#10b981;font-weight:800;\">{{ $json.m.citation_coverage }}%</td>\n          </tr>\n        </table>\n        <p style=\"font-size:13px;color:#64748b;margin:0 0 20px;\">\n          <i>Nota: Se adjunta autom\u00e1ticamente el reporte formal en formato PDF para el comit\u00e9 directivo.</i>\n        </p>\n        <div style=\"text-align:center;margin:18px 0 10px;\">\n          <a href=\"http://localhost:3000/reports\" style=\"display:inline-block;background-color:#4f46e5;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;\">\n            Ver M\u00f3dulo de Reportes \u2192\n          </a>\n        </div>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"background-color:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;line-height:1.5;\">\n        SecBot Executive Governance System \u2022 Confidencial - Solo uso interno.\n      </td>\n    </tr>\n  </table>\n</div>",
+        "emailFormat": "html"
+      },
+      "id": "email",
+      "name": "Email Gesti\u00f3n",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        860,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "HZxABrVSHtvU1Pk9",
+          "name": "secbot-smtp"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron Lunes 09:00": {
+      "main": [
+        [
+          {
+            "node": "GET M\u00e9tricas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET PDF",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GET M\u00e9tricas": {
+      "main": [
+        [
+          {
+            "node": "Calcular Tendencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Tendencia": {
+      "main": [
+        [
+          {
+            "node": "Email Gesti\u00f3n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET PDF": {
+      "main": [
+        [
+          {
+            "node": "Email Gesti\u00f3n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "timezone": "America/Lima"
+  },
+  "active": true,
+  "tags": [],
+  "id": "secbot-wf-10"
+}

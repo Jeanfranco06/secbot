@@ -16,7 +16,7 @@ from sqlalchemy import text
 
 from app import models
 from app.config import settings
-from app.database import SessionLocal
+from app.database import SessionLocal, get_db
 
 log = logging.getLogger(__name__)
 
@@ -174,7 +174,7 @@ def invalidate_permissions_cache() -> None:
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(lambda: next(_db_iter())),
+    db: Session = Depends(get_db),
 ) -> models.User:
     payload = decode_token(token)
     if payload.get("kind") != "access":
@@ -186,15 +186,10 @@ def get_current_user(
     return user
 
 
-def _db_iter():
-    from app.database import get_db as _g
-    yield from _g()
-
-
 def require_permissions(*codes: str):
     def _checker(
         user: models.User = Depends(get_current_user),
-        db: Session = Depends(_db_iter),
+        db: Session = Depends(get_db),
     ):
         perms = get_user_permissions(db, user.id)
         missing = [c for c in codes if c not in perms]
@@ -210,7 +205,7 @@ def require_permissions(*codes: str):
 def require_any_permission(*codes: str):
     def _checker(
         user: models.User = Depends(get_current_user),
-        db: Session = Depends(_db_iter),
+        db: Session = Depends(get_db),
     ):
         perms = get_user_permissions(db, user.id)
         if not any(c in perms for c in codes):
@@ -222,7 +217,7 @@ def require_any_permission(*codes: str):
 def require_roles(*allowed: str):
     def _checker(
         user: models.User = Depends(get_current_user),
-        db: Session = Depends(_db_iter),
+        db: Session = Depends(get_db),
     ):
         roles = get_user_roles(db, user.id)
         if not any(r in allowed for r in roles):

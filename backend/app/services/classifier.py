@@ -111,6 +111,30 @@ def _rule_hit(msg: str) -> Optional[tuple[str, float]]:
         for kw in kws:
             if kw in low:
                 return cat, 0.85
+
+    # Detección heurística de phishing / ingeniería social / robo de credenciales
+    has_url = any(u in low for u in ["http://", "https://", "www.", ".tk", ".ml", ".ga", ".cf", ".gq", ".top", ".xyz", ".cc", ".buzz"])
+    has_urgency = any(w in low for w in [
+        "urgente", "congelan", "congelar", "suspenden", "suspensión", "suspension",
+        "bloqueo", "bloquear", "inmediato", "24 horas", "48 horas", "supuesto",
+        "suplant", "gerente general", "ceo", "rrhh", "liquidaci"
+    ])
+    has_creds = any(w in low for w in [
+        "clave", "password", "contraseña", "contrasena", "dni", "credencial",
+        "token", "login", "cuenta", "banco", "validar", "verificar"
+    ])
+    has_comms = any(w in low for w in [
+        "correo", "email", "mensaje", "enlace", "link", "remitente", "adjunto", "portal"
+    ])
+
+    # Si hay enlace combinado con urgencia o solicitud de credenciales
+    if has_url and (has_urgency or has_creds):
+        return "phishing", 0.90
+
+    # Si hay contexto de correo con urgencia y solicitud de credenciales
+    if has_comms and has_urgency and has_creds:
+        return "phishing", 0.88
+
     return None
 
 
@@ -138,3 +162,64 @@ def classify(message: str) -> dict:
     except Exception as e:
         log.warning("classifier_llm_error", extra={"err": str(e)})
         return {"is_incident": False, "category": "otro", "severity": "P4", "confidence": 0.0}
+
+
+def infer_topic(
+    message: str,
+    citations: Optional[list] = None,
+    incident_category: Optional[str] = None,
+) -> str:
+    """Infiere el tema o política de seguridad de una consulta de forma robusta y legible."""
+    # 1. Si hay citas normativas de RAG, el documento citado es la fuente más precisa
+    if citations:
+        for c in citations:
+            raw_title = (c.get("title") or "").strip()
+            if raw_title:
+                title = raw_title.replace("_", " ").replace(".md", "").strip()
+                title = re.sub(r"\s+v\d+(\.\d+)?", "", title, flags=re.IGNORECASE).strip()
+                low = title.lower()
+                if "contrase" in low or "password" in low:
+                    return "Política de Contraseñas"
+                elif "phishing" in low or "correo" in low:
+                    return "Runbook de Phishing"
+                elif "dispositivo" in low or "móvil" in low or "movil" in low or "usb" in low:
+                    return "Política de Dispositivos Móviles"
+                elif "uso aceptable" in low:
+                    return "Política de Uso Aceptable"
+                elif "acceso" in low:
+                    return "Runbook de Acceso No Autorizado"
+                elif "pérdida" in low or "perdida" in low or "portátil" in low or "portatil" in low:
+                    return "Runbook de Pérdida de Portátil"
+                elif "faq" in low:
+                    return "FAQ General de Seguridad"
+                return title.title()
+
+    # 2. Si es incidente clasificado con categoría específica
+    if incident_category and incident_category.lower() not in ("otro", "consulta", "knowledge_query", "sin_clasificar"):
+        cat_map = {
+            "phishing": "Phishing y Correo Sospechoso",
+            "malware": "Malware y Ransomware",
+            "acceso": "Control de Acceso e Intrusiones",
+            "credenciales": "Compromiso de Credenciales",
+            "dispositivo": "Dispositivos y Medios Extraíbles",
+        }
+        return cat_map.get(incident_category.lower(), incident_category.title())
+
+    # 3. Análisis heurístico y semántico por palabras clave en el mensaje
+    low_msg = (message or "").lower()
+    if any(k in low_msg for k in ["contraseñ", "password", "clave", "pin", "credencial", "longitud mínima", "complejidad"]):
+        return "Política de Contraseñas"
+    if any(k in low_msg for k in ["phishing", "correo sospechoso", "email sospechoso", "enlace sospechoso", "suplantaci", "smishing"]):
+        return "Runbook de Phishing"
+    if any(k in low_msg for k in ["usb", "pendrive", "disco externo", "dispositivo personal", "móvil", "celular", "laptop"]):
+        return "Política de Dispositivos Móviles"
+    if any(k in low_msg for k in ["uso aceptable", "redes sociales", "descargar software", "descarga", "navegación"]):
+        return "Política de Uso Aceptable"
+    if any(k in low_msg for k in ["acceso no autorizado", "inicio de sesión sospechoso", "intruso", "mfa", "2fa"]):
+        return "Runbook de Acceso No Autorizado"
+    if any(k in low_msg for k in ["perdí mi portátil", "robo de equipo", "portátil extraviado", "laptop perdida"]):
+        return "Runbook de Pérdida de Portátil"
+    if any(k in low_msg for k in ["incidente", "reportar incidente", "severidad", "fuga de datos", "brecha"]):
+        return "Gestión de Incidentes"
+
+    return "Consultas Generales"

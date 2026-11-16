@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { authApi } from "@/lib/api";
+import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { authApi, saveTokens } from "@/lib/api";
 import { Button, Input } from "@/ui";
+import { Icon } from "@/components/Icon";
+import { SecBotLogo } from "@/components/SecBotLogo";
 import "./login.css";
 
 export default function Login() {
   const { login, user } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const { lang, toggleLang, t } = useLanguage();
   const toast = useToast();
   const nav = useNavigate();
   const loc = useLocation();
@@ -27,7 +33,7 @@ export default function Login() {
     const refresh = h.get("refresh");
     if (access && refresh) {
       window.history.replaceState(null, "", window.location.pathname);
-      import("@/lib/api").then(({ saveTokens }) => saveTokens(access, refresh));
+      saveTokens(access, refresh);
     }
   }, []);
 
@@ -37,10 +43,10 @@ export default function Login() {
     setBusy(true);
     try {
       await login(form.email, form.password);
-      toast.success("Sesión iniciada correctamente");
+      toast.success(lang === "es" ? "Sesión iniciada correctamente" : "Successfully signed in");
       nav(loc.state?.from?.pathname || "/chat", { replace: true });
     } catch (err) {
-      setError(err.message || "Credenciales inválidas");
+      setError(err.message || (lang === "es" ? "Credenciales inválidas" : "Invalid credentials"));
     } finally {
       setBusy(false);
     }
@@ -51,24 +57,57 @@ export default function Login() {
 
   return (
     <div className="login-wrap">
-      <form className="login-card" onSubmit={submit} aria-label="Inicio de sesión">
+      {/* Top right quick utilities */}
+      <div className="login-top-bar">
+        <button
+          className="login-tool-btn"
+          onClick={toggleTheme}
+          title={isDark ? t("theme.toLight") : t("theme.toDark")}
+          aria-label={isDark ? t("theme.toLight") : t("theme.toDark")}
+        >
+          <Icon name={isDark ? "sun" : "moon"} size={16} />
+        </button>
+        <button
+          className="login-tool-btn lang-btn"
+          onClick={toggleLang}
+          title={t("lang.switch")}
+          aria-label={t("lang.switch")}
+        >
+          <Icon name="globe" size={15} />
+          <span>{lang.toUpperCase()}</span>
+        </button>
+      </div>
+
+      <form className="login-card glass-panel" onSubmit={submit} aria-label="Inicio de sesión">
         <div className="login-brand">
-          <div className="login-brand-icon">🛡️</div>
+          <SecBotLogo size={52} showText={false} />
         </div>
-        <h1>SecBot Enterprise</h1>
-        <p className="login-sub">Asistente Inteligente de Seguridad y Cumplimiento</p>
+
+        <h1 className="login-title">SecBot Enterprise</h1>
+        <p className="login-sub">
+          {lang === "es"
+            ? "Plataforma Inteligente de Seguridad y Cumplimiento"
+            : "Enterprise Cybersecurity & Compliance AI Platform"}
+        </p>
+
+        <div className="login-badges-row">
+          <span className="sec-pill"><Icon name="lock" size={11} /> RSA-256</span>
+          <span className="sec-pill"><Icon name="key" size={11} /> RBAC</span>
+          <span className="sec-pill"><Icon name="shield" size={11} /> NIST CSF</span>
+        </div>
 
         <Input
-          label="Correo Corporativo"
-          placeholder="usuario@empresa.com"
+          label={lang === "es" ? "Correo Corporativo" : "Corporate Email"}
+          placeholder="admin@empresa.local"
           type="email"
           autoComplete="email"
           required
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
+
         <Input
-          label="Contraseña"
+          label={lang === "es" ? "Contraseña" : "Password"}
           placeholder="••••••••••••"
           type="password"
           autoComplete="current-password"
@@ -78,13 +117,16 @@ export default function Login() {
           error={error}
         />
 
-        <Button type="submit" loading={busy} size="lg" variant="primary">
-          Ingresar al Portal
+        <Button type="submit" loading={busy} size="lg" variant="primary" className="login-submit-btn">
+          <Icon name="lock" size={16} />
+          <span>{lang === "es" ? "Ingresar al Portal" : "Sign In to Portal"}</span>
         </Button>
 
         {enabled.length > 0 && (
           <>
-            <div className="login-divider"><span>o continuar con</span></div>
+            <div className="login-divider">
+              <span>{lang === "es" ? "o continuar con" : "or continue with"}</span>
+            </div>
             {enabled.map(([name]) => (
               <a
                 key={name}
@@ -98,7 +140,12 @@ export default function Login() {
         )}
 
         <div className="login-footer-hint">
-          Protegido con autenticación criptográfica RSA-256 y control de acceso RBAC.
+          <Icon name="shield-check" size={13} />
+          <span>
+            {lang === "es"
+              ? "Autenticación segura con JWT RS256 y control de acceso por roles."
+              : "Secured with RS256 cryptographic signatures and role-based access."}
+          </span>
         </div>
       </form>
     </div>

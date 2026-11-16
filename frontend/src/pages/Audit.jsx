@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { adminApi } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import { Button, Card, Input, Modal, Spinner, Table, Badge } from "@/ui";
+import { Icon } from "@/components/Icon";
 
 export default function Audit() {
   const toast = useToast();
@@ -152,30 +153,89 @@ export default function Audit() {
         footer={<Button variant="secondary" onClick={() => setDetail(null)}>Cerrar</Button>}
       >
         {detail && (
-          <div className="col">
+          <div className="col" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <dl className="def-list">
               <dt>ID Registro</dt>
-              <dd className="text-mono">{detail.id}</dd>
+              <dd className="text-mono" style={{ fontWeight: 700, color: "var(--c-primary)" }}>#{detail.id}</dd>
               <dt>Timestamp</dt>
               <dd>{new Date(detail.created_at).toLocaleString()}</dd>
               <dt>Módulo / Acción</dt>
-              <dd><b>{detail.module}</b> :: {detail.action}</dd>
+              <dd>
+                <b style={{ color: "var(--c-text)" }}>{detail.module}</b> :: <Badge tone="info">{detail.action}</Badge>
+              </dd>
+              <dt>Resultado</dt>
+              <dd>
+                <Badge tone={detail.result === "ok" ? "success" : "danger"}>
+                  {detail.result === "ok" ? "Éxito (OK)" : "Fallido / Error"}
+                </Badge>
+              </dd>
               <dt>Entidad / ID</dt>
-              <dd>{detail.entity || "—"} {detail.entity_id ? `(${detail.entity_id})` : ""}</dd>
+              <dd>{detail.entity || "Sistema"} {detail.entity_id ? `(${detail.entity_id})` : ""}</dd>
               <dt>IP & User Agent</dt>
-              <dd>{detail.ip || "—"} — <span className="text-xs text-muted">{detail.user_agent || "—"}</span></dd>
+              <dd>
+                <span className="text-mono">{detail.ip || "127.0.0.1"}</span>
+                <span className="text-xs text-muted" style={{ display: "block", marginTop: 2 }}>{detail.user_agent || "SecBot Web Client 3.0"}</span>
+              </dd>
               <dt>Request ID</dt>
-              <dd className="text-mono text-xs">{detail.request_id || "—"}</dd>
+              <dd className="text-mono text-xs">{detail.request_id || "req-sys-" + detail.id}</dd>
             </dl>
 
-            <div className="mt-3">
-              <h4>Datos de Entrada (Input)</h4>
-              <pre className="json-view">{JSON.stringify(detail.input, null, 2) || "null"}</pre>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <Icon name="terminal" size={16} style={{ color: "var(--c-primary)" }} />
+                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--c-text)" }}>
+                  Datos de Entrada (Input Payload)
+                </h4>
+              </div>
+              {detail.input && typeof detail.input === "object" && Object.keys(detail.input).length > 0 ? (
+                <pre className="json-view" style={{ maxHeight: 220, overflow: "auto", margin: 0, borderRadius: "var(--r-sm)" }}>
+                  {JSON.stringify(detail.input, null, 2)}
+                </pre>
+              ) : (
+                <div style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--r-sm)",
+                  background: "var(--c-bg-subtle)",
+                  border: "1px dashed var(--c-border)",
+                  fontSize: 13,
+                  color: "var(--c-text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8
+                }}>
+                  <Icon name="info" size={15} />
+                  <span>Sin parámetros de entrada adicionales registrados para esta operación.</span>
+                </div>
+              )}
             </div>
 
-            <div className="mt-3">
-              <h4>Datos de Salida (Output)</h4>
-              <pre className="json-view">{JSON.stringify(detail.output, null, 2) || "null"}</pre>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <Icon name="shield-check" size={16} style={{ color: "var(--c-success)" }} />
+                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--c-text)" }}>
+                  Datos de Salida (Output / Respuesta)
+                </h4>
+              </div>
+              {detail.output && typeof detail.output === "object" && Object.keys(detail.output).length > 0 ? (
+                <pre className="json-view" style={{ maxHeight: 220, overflow: "auto", margin: 0, borderRadius: "var(--r-sm)" }}>
+                  {JSON.stringify(detail.output, null, 2)}
+                </pre>
+              ) : (
+                <div style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--r-sm)",
+                  background: "var(--c-bg-subtle)",
+                  border: "1px dashed var(--c-border)",
+                  fontSize: 13,
+                  color: "var(--c-text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8
+                }}>
+                  <Icon name="info" size={15} />
+                  <span>Operación completada con resultado "{detail.result}". Sin datos de salida adicionales.</span>
+                </div>
+              )}
             </div>
           </div>
         )}

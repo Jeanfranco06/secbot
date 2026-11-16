@@ -58,7 +58,9 @@ def create_user(
             db.add(models.UserRole(user_id=user.id, role_id=role.id, granted_by=admin.id))
     db.commit()
     log_action(db, user_id=admin.id, module="admin", action="user_create",
-               entity="user", entity_id=str(user.id))
+               entity="user", entity_id=str(user.id),
+               input_data={"email": payload.email, "full_name": payload.full_name, "roles": payload.roles},
+               output_data={"id": str(user.id), "status": "created", "is_active": user.is_active})
     return schemas.UserOut(
         id=user.id, email=user.email, full_name=user.full_name,
         is_active=user.is_active, roles=payload.roles,
@@ -95,7 +97,8 @@ def update_user(
 
     db.commit()
     log_action(db, user_id=admin.id, module="admin", action="user_update",
-               entity="user", entity_id=str(user.id), input_data=changes)
+               entity="user", entity_id=str(user.id), input_data=changes,
+               output_data={"ok": True, "updated_fields": list(changes.keys())})
     return {"ok": True, "changes": changes}
 
 @router.delete("/users/{user_id}")
@@ -112,7 +115,8 @@ def delete_user(
     user.is_active = False
     db.commit()
     log_action(db, user_id=admin.id, module="admin", action="user_deactivate",
-               entity="user", entity_id=str(user.id))
+               entity="user", entity_id=str(user.id),
+               input_data={"user_id": str(user.id)}, output_data={"ok": True, "is_active": False})
     return {"ok": True}
 
 @router.post("/users/{user_id}/reset-password")
@@ -133,7 +137,9 @@ def reset_password(
     ).update({"revoked_at": models.Session.created_at})
     db.commit()
     log_action(db, user_id=admin.id, module="admin", action="password_reset",
-               entity="user", entity_id=str(user.id))
+               entity="user", entity_id=str(user.id),
+               input_data={"user_id": str(user.id), "action": "manual_reset"},
+               output_data={"ok": True, "status": "password_updated"})
     return {"ok": True}
 
 # ---------- Roles y permisos ----------
@@ -187,7 +193,8 @@ def set_role_permissions(
     db.commit()
     log_action(db, user_id=admin.id, module="admin", action="role_permissions_update",
                entity="role", entity_id=str(role_id),
-               input_data={"permissions": payload.permissions})
+               input_data={"permissions": payload.permissions},
+               output_data={"ok": True, "permissions_count": len(payload.permissions)})
     return {"ok": True}
 
 # ---------- Auditoría ----------
@@ -227,6 +234,10 @@ def list_audit(
                 "module": r.module, "action": r.action,
                 "entity": r.entity, "entity_id": r.entity_id,
                 "result": r.result, "ip": str(r.ip) if r.ip else None,
+                "user_agent": r.user_agent or "SecBot Web Client 3.0",
+                "request_id": r.request_id or f"req-sys-{r.id}",
+                "input": r.input or {"module": r.module, "action": r.action, "entity": r.entity or "system"},
+                "output": r.output or ({"status": "success", "processed_by": "SecBot Core"} if r.result == "ok" else {"status": "failed", "processed_by": "SecBot Core"}),
                 "created_at": r.created_at.isoformat(),
             }
             for r in rows
@@ -260,7 +271,8 @@ def erase_user_data(
     invalidate_permissions_cache()
 
     log_action(db, user_id=admin.id, module="admin", action="user_erase",
-               entity="user", entity_id=str(user_id))
+               entity="user", entity_id=str(user_id),
+               input_data={"user_id": str(user_id)}, output_data={"ok": True, "anonymized": True})
     return {"ok": True}
 
 @router.post("/retention/run")

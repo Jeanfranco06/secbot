@@ -3,13 +3,23 @@
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 3 * * *" }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
       },
       "id": "cron",
       "name": "Cron 03:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [200, 300]
+      "position": [
+        200,
+        300
+      ]
     },
     {
       "parameters": {
@@ -23,59 +33,137 @@
       "name": "POST Retención",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [420, 300],
-      "credentials": { "httpHeaderAuth": { "id": "1", "name": "secbot-service-token" } }
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "EiFn9YNuBJL7EfGH",
+          "name": "secbot-service-token"
+        }
+      }
     },
     {
       "parameters": {
         "conditions": {
-          "boolean": [{ "value1": "={{ $json.ok }}", "value2": true }]
+          "boolean": [
+            {
+              "value1": "={{ $json.ok }}",
+              "value2": true
+            }
+          ]
         }
       },
       "id": "if-ok",
       "name": "IF OK",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [640, 300]
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
         "select": "channel",
-        "channelId": { "__rl": true, "value": "#secbot-alertas", "mode": "name" },
+        "channelId": {
+          "__rl": true,
+          "value": "#secbot-alertas",
+          "mode": "name"
+        },
         "text": "=🧹 Retención ejecutada\nChats: {{ $json.deleted.chat }}\nTickets: {{ $json.deleted.tickets }}\nReportes: {{ $json.deleted.reports }}"
       },
       "id": "slack-ok",
       "name": "Slack OK",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
-      "position": [860, 220],
-      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+      "position": [
+        860,
+        220
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "1",
+          "name": "secbot-slack"
+        }
+      },
+      "disabled": true
     },
     {
       "parameters": {
         "select": "channel",
-        "channelId": { "__rl": true, "value": "#secbot-alertas", "mode": "name" },
+        "channelId": {
+          "__rl": true,
+          "value": "#secbot-alertas",
+          "mode": "name"
+        },
         "text": "=⚠️ Retención falló: {{ JSON.stringify($json) }}"
       },
       "id": "slack-fail",
       "name": "Slack Fallo",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
-      "position": [860, 380],
-      "credentials": { "slackApi": { "id": "1", "name": "secbot-slack" } }
+      "position": [
+        860,
+        380
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "1",
+          "name": "secbot-slack"
+        }
+      },
+      "disabled": true
     }
   ],
   "connections": {
-    "Cron 03:00": { "main": [[{ "node": "POST Retención", "type": "main", "index": 0 }]] },
-    "POST Retención": { "main": [[{ "node": "IF OK", "type": "main", "index": 0 }]] },
+    "Cron 03:00": {
+      "main": [
+        [
+          {
+            "node": "POST Retención",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Retención": {
+      "main": [
+        [
+          {
+            "node": "IF OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "IF OK": {
       "main": [
-        [{ "node": "Slack OK", "type": "main", "index": 0 }],
-        [{ "node": "Slack Fallo", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Slack OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Fallo",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "settings": { "errorWorkflow": "error-handler", "timezone": "America/Lima" },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "timezone": "America/Lima"
+  },
   "active": true,
-  "tags": [{ "name": "secbot" }, { "name": "infra" }]
+  "tags": [],
+  "id": "secbot-wf-05"
 }

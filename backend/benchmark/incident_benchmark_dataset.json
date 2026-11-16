@@ -1,0 +1,152 @@
+[
+  {
+    "text": "Recibí un correo de soporte@paypal-security-update.com pidiéndome confirmar mi contraseña urgente",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Un email con asunto FACTURA_PENDIENTE_OCTUBRE.pdf.exe pide que lo abra para evitar cargos",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Llegó un mensaje diciendo que mi cuenta de Microsoft 365 expirará en 2 horas si no inicio sesión aquí",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "El director financiero me mandó un correo desde una dirección gmail pidiendo una transferencia urgente",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Alerta de DHL: paquete retenido en aduana, ingrese sus datos bancarios para liberar el envío",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Mensaje de WhatsApp supuestamente de RRHH ofreciendo un bono si instalo una APK en mi celular",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Un correo dice que gané una tarjeta de regalo de Amazon corporativa, pide ingresar usuario y clave",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Notificación de reinicio de contraseña de Google que yo no solicité con un enlace extraño",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Correo supuestamente del banco solicitando coordenadas de mi token físico para sincronización",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Mensaje urgente de TI pidiendo que envíe mi contraseña actual para una auditoría de seguridad",
+    "expected": "phishing",
+    "is_incident": true
+  },
+  {
+    "text": "Dejé mi laptop en el taxi camino a la oficina y no tenía contraseña de BIOS",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Encontré un USB tirado en el estacionamiento y al conectarlo se abrieron ventanas de consola solas",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Mis archivos de la carpeta compartida ahora tienen extensión .locked y un bloc de notas pidiendo rescate",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Aparece un inicio de sesión exitoso en mi cuenta desde Rusia mientras yo estaba durmiendo",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "El antivirus EDR alertó de una inyección de memoria sospechosa en el proceso powershell.exe",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Un colaborador subió por error una base de datos de clientes con tarjetas a un repositorio GitHub público",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Un exempleado despedido ayer sigue teniendo acceso activo a la VPN y descargando archivos",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Detecté conexiones salientes cada 5 minutos hacia una dirección IP pública en puerto 4444",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Alguien cloneó la tarjeta de acceso a la sala de servidores y entró a las 3 AM",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "Perdí mi teléfono corporativo en un evento y tenía configurado el autenticador MFA sin PIN",
+    "expected": "compromiso",
+    "is_incident": true
+  },
+  {
+    "text": "¿Dónde puedo consultar la política de contraseñas de la empresa?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cómo solicito una nueva laptop porque la mía está muy lenta?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cuál es la vigencia de mi certificado digital corporativo?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Puedo instalar Spotify en mi computadora para escuchar música mientras trabajo?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cuál es el procedimiento para solicitar permisos de acceso a una carpeta de red?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cuándo se realizará la próxima capacitación obligatoria de ciberseguridad?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cómo configuro la VPN corporativa en mi máquina con Windows 11?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Qué extensión de navegador está recomendada para gestión de contraseñas?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Con quién debo coordinar para la renovación de mi credencial de ingreso físico?",
+    "expected": "consulta",
+    "is_incident": false
+  },
+  {
+    "text": "¿Cuál es el horario de atención de la mesa de ayuda de soporte técnico?",
+    "expected": "consulta",
+    "is_incident": false
+  }
+]

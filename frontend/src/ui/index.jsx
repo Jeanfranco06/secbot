@@ -138,13 +138,22 @@ export function Table({ columns, rows, empty = "Sin datos", rowKey = (r, i) => i
 // ---------- Modal ----------
 export function Modal({ open, title, onClose, children, footer, size = "md" }) {
   const ref = useRef(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose?.();
+    const onKey = (e) => {
+      if (e.key === "Escape") onCloseRef.current?.();
+    };
     document.addEventListener("keydown", onKey);
-    ref.current?.focus();
+    // Focus the modal dialog ONLY once on opening if an inner element is not already focused
+    if (ref.current && !ref.current.contains(document.activeElement)) {
+      ref.current.focus();
+    }
     return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open]);
+
   if (!open) return null;
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">

@@ -1,0 +1,210 @@
+{
+  "name": "daily-summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "cron",
+      "name": "Cron 08:00 L-V",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.SECBOT_BASE_URL }}/api/v1/reports/management?months=1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "http-report",
+      "name": "GET Reporte",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "EiFn9YNuBJL7EfGH",
+          "name": "secbot-service-token"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatear HTML de resumen con dise\u00f1o corporativo SecBot\nconst d = $input.first().json;\nconst top = (d.top_topics || []).slice(0,5).map(t => `<li style=\"margin-bottom:6px;\"><b>${t.topic}</b>: <span style=\"font-family:monospace;font-weight:bold;color:#4f46e5;\">${t.n} consultas</span></li>`).join('');\nconst incidents = d.incidents_reported || 0;\nconst color = incidents > 10 ? '#ef4444' : incidents > 3 ? '#f59e0b' : '#10b981';\nconst resolutionPct = d.total_queries > 0 ? ((d.resolved_without_escalation / d.total_queries) * 100).toFixed(1) : '100.0';\n\nconst html = `\n<div style=\"background-color:#f1f5f9;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;\">\n  <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width:640px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(15,23,42,0.08);border:1px solid #e2e8f0;\">\n    <tr>\n      <td style=\"background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:26px 32px;border-bottom:3px solid #6366f1;\">\n        <span style=\"font-size:11px;font-weight:700;letter-spacing:1px;color:#cbd5e1;text-transform:uppercase;\">REPORTE OPERATIVO DIARIO \u2022 SOC SECBOT</span>\n        <h1 style=\"margin:6px 0 0;font-size:20px;font-weight:800;color:#ffffff;\">Resumen de Operaciones \u2014 ${new Date().toISOString().slice(0,10)}</h1>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"padding:28px 32px;\">\n        <p style=\"margin:0 0 18px;font-size:14.5px;color:#334155;line-height:1.5;\">\n          A continuaci\u00f3n se presenta el balance operacional de consultas procesadas, tiempos de latencia y nivel de resoluci\u00f3n del asistente en las \u00faltimas 24 horas.\n        </p>\n        <table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:20px;font-size:13.5px;\">\n          <tr>\n            <td width=\"50%\" style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Consultas Atendidas</td>\n            <td style=\"color:#0f172a;font-weight:800;font-family:monospace;border-bottom:1px solid #e2e8f0;\">${d.total_queries}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Resueltas Sin Escalar</td>\n            <td style=\"color:#10b981;font-weight:800;border-bottom:1px solid #e2e8f0;\">${d.resolved_without_escalation} (${resolutionPct}%)</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Incidentes Registrados</td>\n            <td style=\"color:${color};font-weight:800;border-bottom:1px solid #e2e8f0;\">${incidents}</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Latencia Percentil 95 (p95)</td>\n            <td style=\"color:#0f172a;font-weight:700;border-bottom:1px solid #e2e8f0;\">${d.p95_latency_ms} ms</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;\">Cobertura de Citas Verificadas</td>\n            <td style=\"color:#0f172a;font-weight:700;border-bottom:1px solid #e2e8f0;\">${d.citation_coverage}%</td>\n          </tr>\n          <tr>\n            <td style=\"color:#64748b;font-weight:600;\">Horas Hombre Ahorradas</td>\n            <td style=\"color:#4f46e5;font-weight:800;\">${d.hours_saved} h</td>\n          </tr>\n        </table>\n\n        <h3 style=\"margin:20px 0 10px;font-size:14px;color:#0f172a;font-weight:700;\">Temas M\u00e1s Consultados</h3>\n        <ul style=\"margin:0 0 20px;padding-left:18px;color:#475569;font-size:13px;line-height:1.6;\">${top || '<li>Sin consultas registradas</li>'}</ul>\n\n        <div style=\"text-align:center;margin:24px 0 10px;\">\n          <a href=\"http://localhost:3000/dashboard\" style=\"display:inline-block;background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;\">\n            Acceder al Dashboard en Vivo \u2192\n          </a>\n        </div>\n      </td>\n    </tr>\n    <tr>\n      <td style=\"background-color:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;line-height:1.5;\">\n        Generado autom\u00e1ticamente por SecBot Monitoring System.\n      </td>\n    </tr>\n  </table>\n</div>`;\n\nreturn [{ json: { html, metrics: d } }];\n"
+      },
+      "id": "code-html",
+      "name": "Formatear HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.metrics.p95_latency_ms }}",
+              "operation": "larger",
+              "value2": 5000
+            }
+          ]
+        }
+      },
+      "id": "if-slow",
+      "name": "IF Latencia Alta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.SMTP_FROM || 'jean20francisco06@gmail.com' }}",
+        "toEmail": "={{ $env.SECURITY_EMAIL }}",
+        "subject": "=[SECBOT] \u26a0\ufe0f Alerta latencia p95 {{ $json.metrics.p95_latency_ms }}ms",
+        "html": "=<p><b>Latencia p95 excede 5s:</b> {{ $json.metrics.p95_latency_ms }} ms</p><p>Revisar carga de Ollama y cach\u00e9 Redis.</p>",
+        "emailFormat": "html",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "email-alert",
+      "name": "Email Alerta",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        220
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "HZxABrVSHtvU1Pk9",
+          "name": "secbot-smtp"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.SMTP_FROM || 'jean20francisco06@gmail.com' }}",
+        "toEmail": "={{ $env.SECURITY_EMAIL }}",
+        "subject": "=[SECBOT] Resumen diario {{ $now.format('yyyy-MM-dd') }}",
+        "html": "={{ $json.html }}",
+        "emailFormat": "html",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "email-summary",
+      "name": "Email Resumen",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        380
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "HZxABrVSHtvU1Pk9",
+          "name": "secbot-smtp"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3
+    }
+  ],
+  "connections": {
+    "Cron 08:00 L-V": {
+      "main": [
+        [
+          {
+            "node": "GET Reporte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Reporte": {
+      "main": [
+        [
+          {
+            "node": "Formatear HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear HTML": {
+      "main": [
+        [
+          {
+            "node": "IF Latencia Alta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Latencia Alta": {
+      "main": [
+        [
+          {
+            "node": "Email Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Alerta": {
+      "main": [
+        [
+          {
+            "node": "Email Resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "timezone": "America/Lima"
+  },
+  "active": true,
+  "tags": [],
+  "id": "secbot-wf-01"
+}

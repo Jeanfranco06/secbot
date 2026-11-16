@@ -1,3 +1,4 @@
+import ipaddress
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
@@ -9,21 +10,30 @@ from app.auth import (
     get_user_permissions,
 )
 from app.services.audit import log_action
+from app.ratelimit import limit_login
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
-from app.ratelimit import limit_login
+def _clean_ip(ip_str: str | None) -> str | None:
+    if not ip_str:
+        return None
+    try:
+        ipaddress.ip_address(ip_str)
+        return ip_str
+    except (ValueError, TypeError):
+        return "127.0.0.1"
 
 @router.post("/login")
 def login(payload: schemas.LoginIn, request: Request, db: Session = Depends(get_db)):
     limit_login(request)
     user = db.query(models.User).filter(models.User.email == payload.email).first()
-    ip = request.client.host if request.client else None
+    ip = _clean_ip(request.client.host if request.client else None)
     ua = request.headers.get("user-agent", "")[:255]
 
     if not user or not verify_password(payload.password, user.password_hash):
         log_action(db, module="auth", action="login", result="fail",
-                   ip=ip, user_agent=ua, input_data={"email": payload.email})
+                   ip=ip, user_agent=ua, input_data={"email": payload.email, "method": "password"},
+                   output_data={"error": "Credenciales inválidas", "code": 401})
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Usuario inactivo")
@@ -44,7 +54,8 @@ def login(payload: schemas.LoginIn, request: Request, db: Session = Depends(get_
     db.commit()
 
     log_action(db, user_id=user.id, module="auth", action="login", result="ok",
-               ip=ip, user_agent=ua)
+               ip=ip, user_agent=ua, input_data={"email": user.email, "method": "password"},
+               output_data={"status": "authenticated", "roles": roles})
     return schemas.TokenOut(access_token=access, refresh_token=refresh)
 
 @router.post("/refresh", response_model=schemas.TokenOut)
@@ -96,7 +107,7 @@ def logout(
                 db.commit()
     except Exception:
         pass
-    log_action(db, user_id=user.id, module="auth", action="logout")
+    log_action(db, user_id=user.id, module="auth", action="logout", input_data={"action": "logout"}, output_data={"status": "session_terminated"})
     return {"ok": True}
 
 @router.get("/me")

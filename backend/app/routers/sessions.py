@@ -52,5 +52,5 @@ def revoke_session(
     s.revoked_reason = "user_revoke"
     db.commit()
     log_action(db, user_id=user.id, module="sessions", action="revoke",
-               entity="session", entity_id=str(s.id))
+               entity="session", entity_id=str(s.id), input_data={"session_id": str(s.id)}, output_data={"ok": True, "status": "revoked"})
     return {"ok": True}

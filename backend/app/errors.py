@@ -1,47 +1,52 @@
-"""Exception handlers centralizados y excepciones de dominio."""
 import logging
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
+from typing import Any
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 log = logging.getLogger(__name__)
 
 
 class DomainError(Exception):
-    """Base para errores de negocio."""
-    status_code = 400
-    code = "domain_error"
-
-    def __init__(self, message: str, **extra):
+    def __init__(self, code: str, message: str, status_code: int = 400, **extra: Any):
         super().__init__(message)
+        self.code = code
         self.message = message
+        self.status_code = status_code
         self.extra = extra
 
 
 class NotFoundError(DomainError):
-    status_code = 404
-    code = "not_found"
+    def __init__(self, entity: str, entity_id: Any):
+        super().__init__(
+            code="not_found",
+            message=f"{entity} con id={entity_id} no existe",
+            status_code=404,
+            entity=entity,
+            entity_id=str(entity_id),
+        )
 
 
 class ConflictError(DomainError):
-    status_code = 409
-    code = "conflict"
+    def __init__(self, message: str, **extra: Any):
+        super().__init__(code="conflict", message=message, status_code=409, **extra)
 
 
 class PermissionDeniedError(DomainError):
-    status_code = 403
-    code = "permission_denied"
+    def __init__(self, message: str = "No tienes permisos suficientes"):
+        super().__init__(code="permission_denied", message=message, status_code=403)
 
 
-class RateLimitError(DomainError):
-    status_code = 429
-    code = "rate_limited"
-
-
-class ExternalServiceError(DomainError):
-    status_code = 502
-    code = "external_service_error"
+class RateLimitExceededError(DomainError):
+    def __init__(self, retry_after: int = 60):
+        super().__init__(
+            code="rate_limit_exceeded",
+            message="Demasiadas peticiones. Intenta más tarde.",
+            status_code=429,
+            retry_after=retry_after,
+        )
 
 
 def install(app: FastAPI) -> None:
@@ -59,7 +64,7 @@ def install(app: FastAPI) -> None:
     async def _validation(request: Request, exc: RequestValidationError):
         return JSONResponse(
             status_code=422,
-            content={"error": "validation_error", "details": exc.errors()},
+            content=jsonable_encoder({"error": "validation_error", "details": exc.errors()}),
         )
 
     @app.exception_handler(StarletteHTTPException)

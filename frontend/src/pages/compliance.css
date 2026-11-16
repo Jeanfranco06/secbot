@@ -1,0 +1,431 @@
+/* ==========================================================================
+   Compliance & Gap Analysis Styles
+   ========================================================================== */
+.compliance-page {
+  padding-bottom: 60px;
+}
+
+.compliance-header-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.compliance-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compliance-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md, 10px);
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.compliance-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--c-text-primary, #f8fafc);
+  letter-spacing: -0.02em;
+}
+
+.compliance-subtitle {
+  color: var(--c-text-muted, #94a3b8);
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+/* Executive KPI Grid */
+.compliance-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.compliance-kpi-card {
+  background: var(--c-bg-card, #1e293b);
+  border: 1px solid var(--c-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-lg, 12px);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.compliance-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.compliance-kpi-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.compliance-kpi-icon.kpi-score {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+.compliance-kpi-icon.kpi-compliant {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.compliance-kpi-icon.kpi-partial {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.compliance-kpi-icon.kpi-gap {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.compliance-kpi-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.compliance-kpi-val {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #fff;
+  line-height: 1.1;
+}
+
+.compliance-kpi-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-text-muted, #94a3b8);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Tabs Navigation */
+.compliance-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--c-border, rgba(255, 255, 255, 0.1));
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.compliance-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--c-text-secondary, #94a3b8);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.compliance-tab-btn:hover {
+  background: var(--c-bg-subtle, rgba(255, 255, 255, 0.04));
+  color: #fff;
+}
+
+.compliance-tab-btn.active {
+  background: rgba(14, 165, 233, 0.12);
+  color: #38bdf8;
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+/* Domain Blocks */
+.domain-card {
+  background: var(--c-bg-card, #1e293b);
+  border: 1px solid var(--c-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-lg, 12px);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.domain-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.domain-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.domain-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.domain-score-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: var(--font-mono, monospace);
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.controls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.control-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-item.status-cumplido {
+  border-left: 4px solid #10b981;
+}
+
+.control-item.status-parcial {
+  border-left: 4px solid #f59e0b;
+}
+
+.control-item.status-brecha {
+  border-left: 4px solid #ef4444;
+}
+
+.control-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.control-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-id-badge {
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.control-title-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.control-status-tag {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+
+.status-cumplido .control-status-tag {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-parcial .control-status-tag {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-brecha .control-status-tag {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.control-evidence {
+  font-size: 12px;
+  color: var(--c-text-secondary, #cbd5e1);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.evidence-tag {
+  font-weight: 700;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.control-recom {
+  font-size: 12px;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+}
+
+.recom-tag {
+  font-weight: 700;
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+/* NIST Grid */
+.nist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.nist-card {
+  background: var(--c-bg-card, #1e293b);
+  border: 1px solid var(--c-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-lg, 12px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nist-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nist-code-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+}
+
+.nist-score-val {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #fff;
+}
+
+.nist-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.nist-desc {
+  font-size: 12px;
+  color: var(--c-text-muted, #94a3b8);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.nist-progress-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.nist-progress-bar {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%);
+}
+
+/* Top Gaps Action Cards */
+.top-gaps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.action-gap-card {
+  background: var(--c-bg-card, #1e293b);
+  border: 1px solid var(--c-border, rgba(255, 255, 255, 0.08));
+  border-left: 4px solid #ef4444;
+  border-radius: var(--r-lg, 12px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-gap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.action-gap-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.action-gap-body {
+  font-size: 12px;
+  color: var(--c-text-secondary, #cbd5e1);
+  line-height: 1.5;
+}
+
+.action-gap-recom {
+  font-size: 12px;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}

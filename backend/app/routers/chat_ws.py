@@ -12,7 +12,7 @@ from app.auth import decode_token
 from app.config import settings
 from app.database import SessionLocal
 from app import models
-from app.services import rag, classifier, tickets, pii, cache, prompt_guard
+from app.services import rag, classifier, tickets, pii, cache, prompt_guard, notification
 from app.services.audit import log_action
 from app import observability
 
@@ -48,6 +48,9 @@ async def chat_ws(ws: WebSocket):
         while True:
             raw = await ws.receive_text()
             data = json.loads(raw)
+            if data.get("type") == "ping":
+                await ws.send_json({"type": "pong"})
+                continue
             guard = prompt_guard.check(data.get("message", ""))
             if not guard.ok:
                 await ws.send_json({"type": "error", "detail": f"rechazado: {guard.reason}"})
@@ -71,23 +74,17 @@ async def chat_ws(ws: WebSocket):
             user_msg = models.ChatMessage(chat_id=chat.id, role="user", content=pii.redact(message))
             db.add(user_msg); db.commit()
 
-            # Streaming simulado por chunks (Ollama no siempre streamea en LangChain)
+            # Clasificación de incidente previa para responder y crear ticket
+            cls = classifier.classify(message)
+            is_incident = cls["is_incident"] and cls["confidence"] >= settings.incident_confidence_threshold
+
+            # Inferencia RAG
             rag_result = await asyncio.to_thread(rag.answer, message)
             answer = rag_result["answer"]
             citations = rag_result["citations"]
 
-            # Enviar tokens
-            chunk_size = 24
-            for i in range(0, len(answer), chunk_size):
-                await ws.send_json({"type": "token", "text": answer[i:i + chunk_size]})
-                await asyncio.sleep(0.01)
-
-            for c in citations:
-                await ws.send_json({"type": "citation", "citation": c})
-
-            cls = classifier.classify(message)
-            is_incident = cls["is_incident"] and cls["confidence"] >= settings.incident_confidence_threshold
             ticket_id = None
+            ticket = None
             if is_incident:
                 ticket = tickets.create_ticket(
                     db, title=f"[{cls['category']}] {message[:80]}",
@@ -97,13 +94,50 @@ async def chat_ws(ws: WebSocket):
                 )
                 ticket_id = str(ticket.id)
                 observability.INCIDENTS.labels(cls["category"], cls["severity"]).inc()
+                asyncio.create_task(
+                    asyncio.to_thread(
+                        notification.notify_incident,
+                        ticket_id=ticket_id,
+                        ticket_number=ticket.ticket_number,
+                        severity=ticket.severity,
+                        category=ticket.category or "otro",
+                        title=ticket.title,
+                        chat_id=str(chat.id),
+                        reported_by=str(user.id),
+                    )
+                )
+                answer += (
+                    f"\n\n🚨 **Incidente Registrado:** He generado automáticamente el ticket "
+                    f"**{ticket.ticket_number}** (Severidad {ticket.severity}). "
+                    f"El equipo de Seguridad y SOC ha sido notificado."
+                )
+
+            # Enviar tokens en streaming
+            chunk_size = 24
+            for i in range(0, len(answer), chunk_size):
+                await ws.send_json({"type": "token", "text": answer[i:i + chunk_size]})
+                await asyncio.sleep(0.01)
+
+            for c in citations:
+                await ws.send_json({"type": "citation", "citation": c})
+
+            if ticket:
                 await ws.send_json({"type": "ticket", "ticket_id": ticket_id,
                                     "ticket_number": ticket.ticket_number,
                                     "severity": ticket.severity})
 
+            topic = classifier.infer_topic(
+                message,
+                citations=citations,
+                incident_category=cls["category"] if is_incident else None,
+            )
+            user_msg.intent = topic
+            db.add(user_msg)
+            db.commit()
+
             assistant_msg = models.ChatMessage(
                 chat_id=chat.id, role="assistant", content=answer,
-                citations=citations, intent=cls["category"] if is_incident else "consulta",
+                citations=citations, intent=topic,
                 confidence=cls["confidence"], latency_ms=rag_result["latency_ms"],
             )
             db.add(assistant_msg); db.commit(); db.refresh(assistant_msg)

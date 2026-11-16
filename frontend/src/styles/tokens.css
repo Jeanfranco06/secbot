@@ -1,15 +1,34 @@
-:root {
-  /* ==========================================================================
-     COLOR SYSTEM - LIGHT MODE (Crisp Enterprise)
-     ========================================================================== */
+/* ==========================================================================
+   COLOR SYSTEM & DESIGN TOKENS (LIGHT & DARK DUAL THEME)
+   SecBot Enterprise AI Cybersecurity - Original Design System
+   Palette: Deep Space Obsidian, Electric Iris, Cyber Cyan, Mint, Amber, Rose
+   ========================================================================== */
+
+:root,
+[data-theme="light"] {
+  /* Surfaces & Backgrounds */
   --c-bg: #f8fafc;
   --c-bg-subtle: #f1f5f9;
   --c-surface: #ffffff;
-  --c-surface-hover: #f8fafc;
-  --c-surface-active: #f1f5f9;
+  --c-surface-hover: #f1f5f9;
+  --c-surface-active: #e2e8f0;
+  --c-surface-card: #ffffff;
   --c-border: #e2e8f0;
   --c-border-subtle: #cbd5e1;
-  --c-border-focus: #3b82f6;
+  --c-border-focus: #6366f1;
+
+  /* Chat Bubbles Light */
+  --c-bubble-user: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  --c-bubble-user-text: #ffffff;
+  --c-bubble-user-border: transparent;
+  --c-bubble-bot: #ffffff;
+  --c-bubble-bot-text: #0f172a;
+  --c-bubble-bot-border: #e2e8f0;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
 
   /* Typography Colors */
   --c-text: #0f172a;
@@ -17,15 +36,32 @@
   --c-text-muted: #64748b;
   --c-text-light: #94a3b8;
 
-  /* Brand / Primary */
-  --c-primary: #2563eb;
-  --c-primary-hover: #1d4ed8;
-  --c-primary-active: #1e40af;
-  --c-primary-subtle: #eff6ff;
-  --c-primary-border: #bfdbfe;
+  /* Brand / Primary - Electric Iris */
+  --c-primary: #4f46e5;
+  --c-primary-hover: #4338ca;
+  --c-primary-active: #3730a3;
+  --c-primary-subtle: #eef2ff;
+  --c-primary-border: #c7d2fe;
   --c-primary-fg: #ffffff;
 
-  /* Accents & States */
+  /* Multi-Color Accent Palette */
+  --c-cyan: #0891b2;
+  --c-cyan-subtle: #ecfeff;
+  --c-cyan-border: #a5f3fc;
+  --c-mint: #059669;
+  --c-mint-subtle: #ecfdf5;
+  --c-mint-border: #a7f3d0;
+  --c-purple: #7c3aed;
+  --c-purple-subtle: #f5f3ff;
+  --c-purple-border: #ddd6fe;
+  --c-amber: #d97706;
+  --c-amber-subtle: #fffbeb;
+  --c-amber-border: #fde68a;
+  --c-rose: #e11d48;
+  --c-rose-subtle: #fff1f2;
+  --c-rose-border: #fecdd3;
+
+  /* Status Tokens */
   --c-success: #10b981;
   --c-success-subtle: #ecfdf5;
   --c-success-border: #a7f3d0;
@@ -36,19 +72,31 @@
   --c-danger-hover: #dc2626;
   --c-danger-subtle: #fef2f2;
   --c-danger-border: #fecaca;
-  --c-info: #0284c7;
+  --c-info: #0ea5e9;
   --c-info-subtle: #f0f9ff;
   --c-info-border: #bae6fd;
 
   /* Severity Tokens */
   --c-p1: #dc2626;
   --c-p1-subtle: #fee2e2;
+  --c-p1-border: #fca5a5;
   --c-p2: #d97706;
   --c-p2-subtle: #fef3c7;
-  --c-p3: #2563eb;
-  --c-p3-subtle: #dbeafe;
+  --c-p2-border: #fcd34d;
+  --c-p3: #4f46e5;
+  --c-p3-subtle: #eef2ff;
+  --c-p3-border: #c7d2fe;
   --c-p4: #64748b;
   --c-p4-subtle: #f1f5f9;
+  --c-p4-border: #cbd5e1;
+
+  /* Shadows */
+  --sh-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --sh-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --sh-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --sh-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1);
+  --sh-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+  --sh-card-hover: 0 10px 20px -3px rgba(15, 23, 42, 0.09);
 
   /* Spacing Scale */
   --s-1: 4px;
@@ -69,20 +117,13 @@
   --r-xl: 20px;
   --r-full: 9999px;
 
-  /* Layered Shadows */
-  --sh-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-  --sh-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-  --sh-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --sh-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
-  --sh-glow: 0 0 25px rgba(37, 99, 235, 0.2);
-
   /* Typography */
   --f-base: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Layout Constants */
-  --nav-h: 64px;
-  --sidebar-w: 280px;
+  --nav-h: 68px;
+  --sidebar-w: 290px;
 
   /* Transitions */
   --t-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -90,47 +131,96 @@
   --t-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --c-bg: #090d16;
-    --c-bg-subtle: #0f172a;
-    --c-surface: #111827;
-    --c-surface-hover: #1e293b;
-    --c-surface-active: #243046;
-    --c-border: #1e293b;
-    --c-border-subtle: #334155;
-    --c-border-focus: #60a5fa;
+[data-theme="dark"] {
+  /* Surfaces & Backgrounds - Deep Space Obsidian */
+  --c-bg: #090a10;
+  --c-bg-subtle: #0f121d;
+  --c-surface: #141826;
+  --c-surface-hover: #1b2033;
+  --c-surface-active: #222940;
+  --c-surface-card: #141826;
+  --c-border: #1e2538;
+  --c-border-subtle: #29324d;
+  --c-border-focus: #818cf8;
 
-    --c-text: #f8fafc;
-    --c-text-secondary: #cbd5e1;
-    --c-text-muted: #94a3b8;
-    --c-text-light: #64748b;
+  /* Chat Bubbles Dark */
+  --c-bubble-user: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  --c-bubble-user-text: #ffffff;
+  --c-bubble-user-border: rgba(99, 102, 241, 0.35);
+  --c-bubble-bot: #141826;
+  --c-bubble-bot-text: #f1f5f9;
+  --c-bubble-bot-border: #1e2538;
 
-    --c-primary: #3b82f6;
-    --c-primary-hover: #60a5fa;
-    --c-primary-active: #2563eb;
-    --c-primary-subtle: rgba(59, 130, 246, 0.15);
-    --c-primary-border: rgba(59, 130, 246, 0.3);
-    --c-primary-fg: #ffffff;
+  /* Glassmorphism Dark */
+  --glass-bg: rgba(20, 24, 38, 0.88);
+  --glass-border: rgba(30, 37, 56, 0.8);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
 
-    --c-success-subtle: rgba(16, 185, 129, 0.15);
-    --c-success-border: rgba(16, 185, 129, 0.3);
-    --c-warning-subtle: rgba(245, 158, 11, 0.15);
-    --c-warning-border: rgba(245, 158, 11, 0.3);
-    --c-danger-subtle: rgba(239, 68, 68, 0.15);
-    --c-danger-border: rgba(239, 68, 68, 0.3);
-    --c-info-subtle: rgba(2, 132, 199, 0.15);
-    --c-info-border: rgba(2, 132, 199, 0.3);
+  /* Typography Colors */
+  --c-text: #f8fafc;
+  --c-text-secondary: #cbd5e1;
+  --c-text-muted: #94a3b8;
+  --c-text-light: #64748b;
 
-    --c-p1-subtle: rgba(220, 38, 38, 0.2);
-    --c-p2-subtle: rgba(217, 119, 6, 0.2);
-    --c-p3-subtle: rgba(37, 99, 235, 0.2);
-    --c-p4-subtle: rgba(100, 116, 139, 0.2);
+  /* Brand / Primary - Electric Iris */
+  --c-primary: #6366f1;
+  --c-primary-hover: #818cf8;
+  --c-primary-active: #4f46e5;
+  --c-primary-subtle: rgba(99, 102, 241, 0.15);
+  --c-primary-border: rgba(99, 102, 241, 0.35);
+  --c-primary-fg: #ffffff;
 
-    --sh-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-    --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-    --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    --sh-glow: 0 0 35px rgba(59, 130, 246, 0.25);
-  }
+  /* Multi-Color Accent Palette */
+  --c-cyan: #06b6d4;
+  --c-cyan-subtle: rgba(6, 182, 212, 0.15);
+  --c-cyan-border: rgba(6, 182, 212, 0.35);
+  --c-mint: #10b981;
+  --c-mint-subtle: rgba(16, 185, 129, 0.15);
+  --c-mint-border: rgba(16, 185, 129, 0.35);
+  --c-purple: #a855f7;
+  --c-purple-subtle: rgba(168, 85, 247, 0.15);
+  --c-purple-border: rgba(168, 85, 247, 0.35);
+  --c-amber: #f59e0b;
+  --c-amber-subtle: rgba(245, 158, 11, 0.15);
+  --c-amber-border: rgba(245, 158, 11, 0.35);
+  --c-rose: #f43f5e;
+  --c-rose-subtle: rgba(244, 63, 94, 0.15);
+  --c-rose-border: rgba(244, 63, 94, 0.35);
+
+  /* Status Tokens */
+  --c-success: #10b981;
+  --c-success-subtle: rgba(16, 185, 129, 0.15);
+  --c-success-border: rgba(16, 185, 129, 0.3);
+  --c-warning: #f59e0b;
+  --c-warning-subtle: rgba(245, 158, 11, 0.15);
+  --c-warning-border: rgba(245, 158, 11, 0.3);
+  --c-danger: #ef4444;
+  --c-danger-hover: #f87171;
+  --c-danger-subtle: rgba(239, 68, 68, 0.15);
+  --c-danger-border: rgba(239, 68, 68, 0.3);
+  --c-info: #06b6d4;
+  --c-info-subtle: rgba(6, 182, 212, 0.15);
+  --c-info-border: rgba(6, 182, 212, 0.3);
+
+  /* Severity Tokens */
+  --c-p1: #f43f5e;
+  --c-p1-subtle: rgba(244, 63, 94, 0.2);
+  --c-p1-border: rgba(244, 63, 94, 0.4);
+  --c-p2: #f59e0b;
+  --c-p2-subtle: rgba(245, 158, 11, 0.2);
+  --c-p2-border: rgba(245, 158, 11, 0.4);
+  --c-p3: #6366f1;
+  --c-p3-subtle: rgba(99, 102, 241, 0.2);
+  --c-p3-border: rgba(99, 102, 241, 0.4);
+  --c-p4: #94a3b8;
+  --c-p4-subtle: rgba(148, 163, 184, 0.15);
+  --c-p4-border: rgba(148, 163, 184, 0.3);
+
+  /* Shadows Dark */
+  --sh-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  --sh-glow: 0 0 35px rgba(99, 102, 241, 0.3);
+  --sh-card-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.7);
 }
