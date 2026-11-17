@@ -1,0 +1,200 @@
+[
+  {
+    "text": "Tráfico saliente anómalo detectado por firewall: exfiltración masiva de datos cifrados por puerto 443 hacia AWS S3 desconocido.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "MITRE ATT&CK T1048 Public Corpus"
+  },
+  {
+    "text": "URL: http://www.livejournal.com/talkread.bml?journal=jwz&itemid=63309 Date: Not suppliedhttp://www.livejournal.com/talkread.bml?journal=jwz&itemid=63309",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "Vulnerabilidad Zero-Day CVE-2023-34362 en MOVEit Transfer explotada activamente para robo de información sensible.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CISA KEV Catalog"
+  },
+  {
+    "text": "re : tetco / hpl ( enerfin ) meter # 986892 step # 1 has been completed . sherlyn , verify step # 2 tomorrow and call me when completed . jackie , verify the nom on oct 4 & 5 . it appears there is still a volume for meter 6892 until oct 6 . if there are any questions or issues , contact me at 37649 . i am the contact person while clem is out ( through friday ) . hc - - - - - - - - - - - - - - - - - - - - - - forwarded by howard b camp / hou / ect on 10 / 04 / 2000 01 : 01 pm - - - - - - - - - - ",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "Minería no autorizada de criptomonedas (XMRig) consumiendo 100% de CPU en clúster Kubernetes de analítica.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CISA Alert AA22-110A"
+  },
+  {
+    "text": "¿Cómo configuro el autenticador Microsoft Authenticator en mi nuevo teléfono celular corporativo?",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "MFA Setup Knowledge Base"
+  },
+  {
+    "text": "blue horseshoe meet me dear reader : we sometimes approach our analysts for their thoughts on emerging market sectors we ' re interested in . on certain occasions , they come to us with intriguing insights of certain aspects of the market that have caught their attention . as you know our track record speaks for itself we are happy to bring you another situation with huge upside potential we think this could be the one that when we look back shortly everyone will be saying i should have more . f",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "Minería no autorizada de criptomonedas (XMRig) consumiendo 100% de CPU en clúster Kubernetes de analítica.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CISA Alert AA22-110A"
+  },
+  {
+    "text": "urgent mr . johnson obipacific bank plc , 9 th floor , ikoyi estatevictoria island , lagos . i am mr . johnson obi , provincial director pacificbank of nigeria , victoria island branch . i haveurgent and very confidential business proposition foryou . on june 6 , 2002 , an american oil consultant / contractorwith the nigeria mining corporation , mr . michaelcreek made a numbered time ( fixed ) deposit fortwelve calendar months , valued at us $ 20 , 200 , 000 . 00 ( twenty million two hundred tho",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "your in - home source of health information regain your confidence viagra online life grants nothing to us mortals without hard work . there is nothing to suggest that mothering cannot be shared by several people . an honest tale speeds best , being plainly told . i told you i was sick .",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "Norton AD Â ATTENTION: This is a MUST for ALL Computer Users!!! Â *NEW - Special Package Deal!* Norton SystemWorks 2002 Software Suite -Professional Edition- Includes Six - Yes 6! - Feature-Packed UtilitiesALL for 1 Special LOW Price! This Software Will:- Protect your computer from unwanted and hazardous viruses- Help secure your private & valuable information- Allow you to transfer files and send e-mails safely- Backup your ALL your data quick and easily- Improve your PC's performance w/superio",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "URL: http://scriptingnews.userland.com/backissues/2002/09/24#When:3:59:56PM Date: Tue, 24 Sep 2002 22:59:56 GMTBruce Loebrich[1] has scraped RSS feeds for Google news, and a RSS 2.0 success story. In other words, it's okay to use the features in 2.0. We're doing it at UserLand and so is Bruce.[1] http://radio.weblogs.com/0104308/2002/09/24.html",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "Múltiples accesos simultáneos a cuenta de administrador de sistemas desde ubicaciones geográficas imposibles (Singapur y Perú en 10 min).",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CIS Control 6.3 Audit Analysis"
+  },
+  {
+    "text": "HELLO,I AM A CITIZEN OF ZAIRE, SON OF THE LATE FORMER PRESIDENT OF ZAIRE (PRESIDENT MOBUTU SESE SEKO) SINCE THE DEATH OF MY LATE FATHER SOME YEARS AGO I HAVE BEEN RESIDING IN SOUTH AFRICA ON TEMPORARY POLITICAL ASYLUM. ON MY ARRIVALIN SOUTH AFRICA AFTER MY LATE FATHER'S BURIAL, I CAME IN WITH A DIPLOMATIC PACKAGED CONSIGNMENT CONTAINING THE SUM OF $8,000,000.00 (EIGHT MILLION UNITED STATES DOLLARS) WHICH I GOT FROM PART OF THE MONEY MY LATE FATHER MADE THROUGH DIAMONDS SALES WHEN HE WAS THE PRES",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "¿Dónde puedo reportar que olvidé la contraseña de mi cuenta institucional para que me reseteen el acceso?",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "IT Service Desk Standard Catalog"
+  },
+  {
+    "text": "Ataque de denegación de servicio distribuido (DDoS) SYN flood saturando el balanceador de carga perimetral a 50 Gbps.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "NIST SP 800-61r2 Sec. 3.4"
+  },
+  {
+    "text": "mobil beaumont - marol just want to confirm the march midcon volumes for mobil : 3 / 21 28 , 271 3 / 22 26 , 221 3 / 23 24 , 459 3 / 24 30 , 000 3 / 25 30 , 000 3 / 26 26 , 852 3 / 27 30 , 000 3 / 28 30 , 000 3 / 29 30 , 000 3 / 30 20 , 164 3 / 31 12 , 365 total 288 , 332 mmbtu this is what i saw in pops - please let me know if there should be any different volumes / days . thanks for your help . rebecca - - - - - - - - - - - - - - - - - - - - - - forwarded by rebecca griffin / na / enron on 04 ",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "the permanent fix to penis enlargement limited time offer : add atleast 3 inches or get your money back - - - - > click here to learn more no thanks",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "presentation on metals - - - - - - - - - - - - - - - - - - - - - - forwarded by leann walton / na / enron on 10 / 26 / 2000 10 : 52 am - - - - - - - - - - - - - - - - - - - - - - - - - - - alison sealy on 10 / 09 / 2000 10 : 37 : 40 am to : mraymon @ enron . com cc : subject : presentation on metals hi maureen , it was good to meet you last week and hear your presentation on the metals - full of advice on what to think about and all the various things that affect the market place . i am only sor",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "¿Qué pasos debo seguir para solicitar acceso temporal a la VPN de administración de infraestructura?",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Remote Access Policy"
+  },
+  {
+    "text": "re [ 10 ] : i trust you at six male paranormalhold on matrix",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "Inyección SQL (SQLi) detectada en portal de clientes autenticado extrayendo registros de tabla usuarios mediante subconsultas booleanas.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "OWASP Top 10 A03:2021"
+  },
+  {
+    "text": "fw : bod agenda deadlines the next bod and committee meetings will be held on april 30 - may 1 . rebecca carter has set the deadline for commercial groups to submit agenda items to her office and to rick buy as wednesday , april 18 . i will forward her notification memo sent to the commercial teams once it is distributed . please contact me as soon as possible if you know of anything that has a possibility to be added to the finance committee agenda . all presentations as approved by rebecca car",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Enron Public Benign Email Corpus"
+  },
+  {
+    "text": "we owe you lots of money dear applicant , after further review upon receiving your application your current mortgage qualifies for a 3 % lower rate . your new monthly payment will be as low as $ 340 / month for a $ 200 , 000 loan . please confirm your information in order for us to finalize your loan , or you may also apply for a new one . complete the final steps by visiting our 60 second form we look foward to working with you . thank you , nicole staley , account manager logan and associates ",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "Modificación sospechosa de reglas de reenvío en buzón de Exchange Online enviando todos los correos entrantes a cuenta externa.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "MITRE ATT&CK T1114.003 Public Corpus"
+  },
+  {
+    "text": "does your business depend on the online success of your website ? submitting your website in search engines may increase your online sales dramatically . if you invested time and money into your website , you simply must submit your website oniine otherwise it will be invisible virtualiy , which means efforts spent in vain . lf you want people to know about your website and boost your revenues , the oniy way to do that is to make your site visibie in places where peopie search for information , ",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "Base de datos de producción volcada en foro clandestino de la Dark Web incluyendo hashes de contraseñas de colaboradores.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CERT Coordination Center Advisory"
+  },
+  {
+    "text": "¿Cuándo se realizará la ventana de mantenimiento mensual para la instalación de parches de seguridad?",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "Change Management Schedule"
+  },
+  {
+    "text": "will cut the years 3 . 51 % @ u ) m $ illions of amtserqaica 5 ns already re - f 8 tinanced ! free servicue ! 3 . 51 % here our economy is doing great . rates ar \" e at 40 year l { ows . and so should you . . . now is the tkime to tadyke advantage of the low ralte 4 s and save th _ o @ usian ~ ds of dollaros . acqpprova 9 l regardless of credit hisgtory ! nobotdy is turbned dsyow ! n . jwoilgn your nation and refiinnance hezar 3 e ! receptacle muong bray tip stature bracken clump gadgetry blair ",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "BODY {font-family=\"Arial\"} TT {font-family=\"Courier New\"} BLOCKQUOTE.CITE {margin:0; padding-left:0.5em; border-left:2px solid;} SPAN.TABOOHEADER {display=none}Online Loan Service What Are You Waiting For? Rates Have Dipped....Approvals Are Up! 7 Now you can shop for your home loan and get the best deal possible through our Online Home Loan Service. Free with no obligation! Act Now! This is the time to take advantage of falling interest rates. Regardless of your credit or income level, money is ",
+    "expected": "phishing",
+    "is_incident": true,
+    "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+  },
+  {
+    "text": "¿Cómo se solicita una excepción temporal a la política de bloqueo de puertos USB en laptops de desarrollo?",
+    "expected": "consulta",
+    "is_incident": false,
+    "source": "SecBot Corporate Policy FAQ"
+  },
+  {
+    "text": "Alerta crítica de EDR CrowdStrike: intento de volcado de memoria de LSASS (procdump.exe) en controlador de dominio corporativo.",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "MITRE ATT&CK T1003.001 Public Corpus"
+  },
+  {
+    "text": "Múltiples accesos simultáneos a cuenta de administrador de sistemas desde ubicaciones geográficas imposibles (Singapur y Perú en 10 min).",
+    "expected": "compromiso",
+    "is_incident": true,
+    "source": "CIS Control 6.3 Audit Analysis"
+  }
+]

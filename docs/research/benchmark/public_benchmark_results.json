@@ -1,0 +1,687 @@
+{
+  "dataset_name": "Public Cybersecurity Benchmark Corpus (Nazario / CEAS-2008 / Enron / NIST / CISA)",
+  "methodology": "Machine Learning Stratified Split 70% Train, 15% Val, 15% Test",
+  "phase": "Fase 2 de Pruebas (Blind Test Set)",
+  "total_test_samples": 33,
+  "total_wall_time_sec": 119.47,
+  "global_accuracy": 0.6667,
+  "macro_precision": 0.811,
+  "macro_recall": 0.6667,
+  "macro_f1": 0.5878,
+  "weighted_f1": 0.5878,
+  "metrics_by_class": {
+    "phishing": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 10,
+      "support": 11,
+      "precision": 1.0,
+      "recall": 0.0909,
+      "f1_score": 0.1667
+    },
+    "compromiso": {
+      "tp": 10,
+      "fp": 1,
+      "fn": 1,
+      "support": 11,
+      "precision": 0.9091,
+      "recall": 0.9091,
+      "f1_score": 0.9091
+    },
+    "consulta": {
+      "tp": 11,
+      "fp": 10,
+      "fn": 0,
+      "support": 11,
+      "precision": 0.5238,
+      "recall": 1.0,
+      "f1_score": 0.6875
+    }
+  },
+  "time_analysis": {
+    "mean_ms": 3620.47,
+    "p50_ms": 3976.96,
+    "p90_ms": 4568.83,
+    "p95_ms": 5075.02,
+    "min_ms": 0.01,
+    "max_ms": 7573.33,
+    "data_dependency_linear_model": {
+      "equation": "T(ms) = 2946.38 + 2.51 * Caracteres",
+      "slope_beta_ms_per_char": 2.511,
+      "intercept_alpha_ms": 2946.38,
+      "pearson_correlation_r": 0.2982,
+      "empirical_conclusion": "Demostrado: El tiempo es relativo y está en función de la Data (r = 0.298)"
+    }
+  },
+  "timing_records": [
+    {
+      "sample_id": 1,
+      "chars": 127,
+      "words": 18,
+      "latency_ms": 0.01,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 2,
+      "chars": 152,
+      "words": 5,
+      "latency_ms": 4284.38,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 3,
+      "chars": 114,
+      "words": 13,
+      "latency_ms": 4138.53,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 4,
+      "chars": 500,
+      "words": 135,
+      "latency_ms": 4568.83,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 5,
+      "chars": 106,
+      "words": 15,
+      "latency_ms": 0.01,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 6,
+      "chars": 97,
+      "words": 12,
+      "latency_ms": 3999.17,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 7,
+      "chars": 500,
+      "words": 92,
+      "latency_ms": 3753.92,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 8,
+      "chars": 106,
+      "words": 15,
+      "latency_ms": 0.1,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 9,
+      "chars": 500,
+      "words": 93,
+      "latency_ms": 7573.33,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 10,
+      "chars": 288,
+      "words": 54,
+      "latency_ms": 3168.57,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 11,
+      "chars": 500,
+      "words": 78,
+      "latency_ms": 0.14,
+      "expected": "phishing",
+      "predicted": "compromiso",
+      "correct": false
+    },
+    {
+      "sample_id": 12,
+      "chars": 346,
+      "words": 44,
+      "latency_ms": 4065.22,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 13,
+      "chars": 137,
+      "words": 19,
+      "latency_ms": 4081.17,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 14,
+      "chars": 500,
+      "words": 87,
+      "latency_ms": 4131.0,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 15,
+      "chars": 105,
+      "words": 17,
+      "latency_ms": 3932.66,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 16,
+      "chars": 117,
+      "words": 18,
+      "latency_ms": 3933.02,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 17,
+      "chars": 500,
+      "words": 146,
+      "latency_ms": 5075.02,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 18,
+      "chars": 148,
+      "words": 31,
+      "latency_ms": 4190.83,
+      "expected": "phishing",
+      "predicted": "phishing",
+      "correct": true
+    },
+    {
+      "sample_id": 19,
+      "chars": 500,
+      "words": 140,
+      "latency_ms": 4766.5,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 20,
+      "chars": 100,
+      "words": 15,
+      "latency_ms": 4072.02,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 21,
+      "chars": 60,
+      "words": 14,
+      "latency_ms": 3179.11,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 22,
+      "chars": 136,
+      "words": 17,
+      "latency_ms": 3256.9,
+      "expected": "compromiso",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 23,
+      "chars": 500,
+      "words": 95,
+      "latency_ms": 4380.46,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 24,
+      "chars": 500,
+      "words": 100,
+      "latency_ms": 4365.48,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 25,
+      "chars": 127,
+      "words": 19,
+      "latency_ms": 3915.19,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 26,
+      "chars": 500,
+      "words": 90,
+      "latency_ms": 3797.59,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 27,
+      "chars": 121,
+      "words": 19,
+      "latency_ms": 3229.51,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 28,
+      "chars": 101,
+      "words": 15,
+      "latency_ms": 3789.81,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 29,
+      "chars": 500,
+      "words": 115,
+      "latency_ms": 4369.52,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 30,
+      "chars": 500,
+      "words": 71,
+      "latency_ms": 3519.56,
+      "expected": "phishing",
+      "predicted": "consulta",
+      "correct": false
+    },
+    {
+      "sample_id": 31,
+      "chars": 106,
+      "words": 18,
+      "latency_ms": 4004.87,
+      "expected": "consulta",
+      "predicted": "consulta",
+      "correct": true
+    },
+    {
+      "sample_id": 32,
+      "chars": 127,
+      "words": 18,
+      "latency_ms": 3956.23,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    },
+    {
+      "sample_id": 33,
+      "chars": 137,
+      "words": 19,
+      "latency_ms": 3976.96,
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "correct": true
+    }
+  ],
+  "detailed_results": [
+    {
+      "id": 1,
+      "text_preview": "Tráfico saliente anómalo detectado por firewall: exfiltración masiva de datos cifrados por...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.85,
+      "latency_ms": 0.01,
+      "source": "MITRE ATT&CK T1048 Public Corpus"
+    },
+    {
+      "id": 2,
+      "text_preview": "URL: http://www.livejournal.com/talkread.bml?journal=jwz&itemid=63309 Date: Not suppliedht...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4284.38,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 3,
+      "text_preview": "Vulnerabilidad Zero-Day CVE-2023-34362 en MOVEit Transfer explotada activamente para robo ...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P1",
+      "confidence": 0.9,
+      "latency_ms": 4138.53,
+      "source": "CISA KEV Catalog"
+    },
+    {
+      "id": 4,
+      "text_preview": "re : tetco / hpl ( enerfin ) meter # 986892 step # 1 has been completed . sherlyn , verify...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4568.83,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 5,
+      "text_preview": "Minería no autorizada de criptomonedas (XMRig) consumiendo 100% de CPU en clúster Kubernet...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.85,
+      "latency_ms": 0.01,
+      "source": "CISA Alert AA22-110A"
+    },
+    {
+      "id": 6,
+      "text_preview": "¿Cómo configuro el autenticador Microsoft Authenticator en mi nuevo teléfono celular corpo...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3999.17,
+      "source": "MFA Setup Knowledge Base"
+    },
+    {
+      "id": 7,
+      "text_preview": "blue horseshoe meet me dear reader : we sometimes approach our analysts for their thoughts...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3753.92,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 8,
+      "text_preview": "Minería no autorizada de criptomonedas (XMRig) consumiendo 100% de CPU en clúster Kubernet...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.85,
+      "latency_ms": 0.1,
+      "source": "CISA Alert AA22-110A"
+    },
+    {
+      "id": 9,
+      "text_preview": "urgent mr . johnson obipacific bank plc , 9 th floor , ikoyi estatevictoria island , lagos...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 7573.33,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 10,
+      "text_preview": "your in - home source of health information regain your confidence viagra online life gran...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3168.57,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 11,
+      "text_preview": "Norton AD Â ATTENTION: This is a MUST for ALL Computer Users!!! Â *NEW - Special Package D...",
+      "expected": "phishing",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.85,
+      "latency_ms": 0.14,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 12,
+      "text_preview": "URL: http://scriptingnews.userland.com/backissues/2002/09/24#When:3:59:56PM Date: Tue, 24 ...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4065.22,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 13,
+      "text_preview": "Múltiples accesos simultáneos a cuenta de administrador de sistemas desde ubicaciones geog...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.8,
+      "latency_ms": 4081.17,
+      "source": "CIS Control 6.3 Audit Analysis"
+    },
+    {
+      "id": 14,
+      "text_preview": "HELLO,I AM A CITIZEN OF ZAIRE, SON OF THE LATE FORMER PRESIDENT OF ZAIRE (PRESIDENT MOBUTU...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4131.0,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 15,
+      "text_preview": "¿Dónde puedo reportar que olvidé la contraseña de mi cuenta institucional para que me rese...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3932.66,
+      "source": "IT Service Desk Standard Catalog"
+    },
+    {
+      "id": 16,
+      "text_preview": "Ataque de denegación de servicio distribuido (DDoS) SYN flood saturando el balanceador de ...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P3",
+      "confidence": 0.0,
+      "latency_ms": 3933.02,
+      "source": "NIST SP 800-61r2 Sec. 3.4"
+    },
+    {
+      "id": 17,
+      "text_preview": "mobil beaumont - marol just want to confirm the march midcon volumes for mobil : 3 / 21 28...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 5075.02,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 18,
+      "text_preview": "the permanent fix to penis enlargement limited time offer : add atleast 3 inches or get yo...",
+      "expected": "phishing",
+      "predicted": "phishing",
+      "severity": "P2",
+      "confidence": 0.0,
+      "latency_ms": 4190.83,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 19,
+      "text_preview": "presentation on metals - - - - - - - - - - - - - - - - - - - - - - forwarded by leann walt...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4766.5,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 20,
+      "text_preview": "¿Qué pasos debo seguir para solicitar acceso temporal a la VPN de administración de infrae...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4072.02,
+      "source": "Remote Access Policy"
+    },
+    {
+      "id": 21,
+      "text_preview": "re [ 10 ] : i trust you at six male paranormalhold on matrix",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3179.11,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 22,
+      "text_preview": "Inyección SQL (SQLi) detectada en portal de clientes autenticado extrayendo registros de t...",
+      "expected": "compromiso",
+      "predicted": "consulta",
+      "severity": "P2",
+      "confidence": 0.8,
+      "latency_ms": 3256.9,
+      "source": "OWASP Top 10 A03:2021"
+    },
+    {
+      "id": 23,
+      "text_preview": "fw : bod agenda deadlines the next bod and committee meetings will be held on april 30 - m...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4380.46,
+      "source": "Enron Public Benign Email Corpus"
+    },
+    {
+      "id": 24,
+      "text_preview": "we owe you lots of money dear applicant , after further review upon receiving your applica...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4365.48,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 25,
+      "text_preview": "Modificación sospechosa de reglas de reenvío en buzón de Exchange Online enviando todos lo...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.8,
+      "latency_ms": 3915.19,
+      "source": "MITRE ATT&CK T1114.003 Public Corpus"
+    },
+    {
+      "id": 26,
+      "text_preview": "does your business depend on the online success of your website ? submitting your website ...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3797.59,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 27,
+      "text_preview": "Base de datos de producción volcada en foro clandestino de la Dark Web incluyendo hashes d...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.0,
+      "latency_ms": 3229.51,
+      "source": "CERT Coordination Center Advisory"
+    },
+    {
+      "id": 28,
+      "text_preview": "¿Cuándo se realizará la ventana de mantenimiento mensual para la instalación de parches de...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3789.81,
+      "source": "Change Management Schedule"
+    },
+    {
+      "id": 29,
+      "text_preview": "will cut the years 3 . 51 % @ u ) m $ illions of amtserqaica 5 ns already re - f 8 tinance...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4369.52,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 30,
+      "text_preview": "BODY {font-family=\"Arial\"} TT {font-family=\"Courier New\"} BLOCKQUOTE.CITE {margin:0; paddi...",
+      "expected": "phishing",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 3519.56,
+      "source": "Nazario/CEAS-2008 Public Phishing Benchmark"
+    },
+    {
+      "id": 31,
+      "text_preview": "¿Cómo se solicita una excepción temporal a la política de bloqueo de puertos USB en laptop...",
+      "expected": "consulta",
+      "predicted": "consulta",
+      "severity": "P4",
+      "confidence": 0.0,
+      "latency_ms": 4004.87,
+      "source": "SecBot Corporate Policy FAQ"
+    },
+    {
+      "id": 32,
+      "text_preview": "Alerta crítica de EDR CrowdStrike: intento de volcado de memoria de LSASS (procdump.exe) e...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P1",
+      "confidence": 0.8,
+      "latency_ms": 3956.23,
+      "source": "MITRE ATT&CK T1003.001 Public Corpus"
+    },
+    {
+      "id": 33,
+      "text_preview": "Múltiples accesos simultáneos a cuenta de administrador de sistemas desde ubicaciones geog...",
+      "expected": "compromiso",
+      "predicted": "compromiso",
+      "severity": "P2",
+      "confidence": 0.8,
+      "latency_ms": 3976.96,
+      "source": "CIS Control 6.3 Audit Analysis"
+    }
+  ]
+}
