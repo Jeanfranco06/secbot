@@ -1,0 +1,5 @@
+"Endpoint","Usuarios","Peticiones","Errores","TasaErrorPct","ThroughputReqSec","MediaMs","MedianaP50Ms","P90Ms","P95Ms","P99Ms","MinMs","MaxMs","Estado"
+"GET /health","50","2229","0","0","111.45","391.8","247","593","862","5339","20","5380","ESTABLE"
+"GET /health","100","2963","0","0","148.15","613.8","595","990","1111","1262","43","1302","ESTABLE"
+"GET /health","250","2382","55","2.31","119.1","1919.6","1469","2589","6874","10010","109","10017","PUNTO DE QUIEBRE"
+"GET /health","500","2883","662","22.96","144.15","3446.8","1459","10010","10013","10018","118","10030","PUNTO DE QUIEBRE"

@@ -1,0 +1,7 @@
+"Endpoint","Usuarios","Peticiones","Errores","TasaErrorPct","ThroughputReqSec","MediaMs","MedianaP50Ms","P90Ms","P95Ms","P99Ms","MinMs","MaxMs","Estado"
+"GET /api/v1/chat/history","20","924","0","0","46.2","382.1","271","575","775","3530","55","3577","ESTABLE"
+"GET /api/v1/chat/history","40","1099","0","0","54.95","646.2","640","1055","1174","1415","32","1685","ESTABLE"
+"GET /api/v1/chat/history","60","1050","0","0","52.5","1020.6","1097","1358","1458","1627","57","1740","ESTABLE"
+"GET /api/v1/chat/history","80","1001","0","0","50.05","1442.7","1347","2120","2518","2785","118","3189","ESTABLE"
+"GET /api/v1/chat/history","100","1090","0","0","54.5","1675.6","1757","2278","2459","2916","138","3754","ESTABLE"
+"GET /api/v1/chat/history","150","558","300","53.76","27.9","6459.3","10003","10014","10017","10023","1151","10034","PUNTO DE QUIEBRE"

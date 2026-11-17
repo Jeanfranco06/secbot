@@ -81,6 +81,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD:-}
       - SMTP_FROM=${SMTP_FROM:-jean20francisco06@gmail.com}
       - SECURITY_EMAIL=${SECURITY_EMAIL:-jean20francisco06@gmail.com}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
       - ENV=${ENV:-development}
     depends_on:

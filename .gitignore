@@ -26,3 +26,12 @@ __pycache__/
 **/__pycache__/
 .history/
 **/.history/
+
+# JMeter reports and logs
+*.jtl
+jmeter.log
+ops/jmeter/reports/
+ops/jmeter/runs/*report*/
+ops/jmeter/*.jtl
+ops/jmeter/*.log
+ops/jmeter/runs/*.jtl

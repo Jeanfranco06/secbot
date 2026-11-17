@@ -1,0 +1,47 @@
+[
+    {
+        "Usuarios":  10,
+        "Peticiones":  92,
+        "Errores":  0,
+        "TasaErrorPct":  0,
+        "ThroughputReqSec":  3.68,
+        "MediaMs":  2597.2,
+        "MedianaP50Ms":  2762,
+        "P90Ms":  2957,
+        "P95Ms":  3055,
+        "P99Ms":  3668,
+        "MinMs":  833,
+        "MaxMs":  3668,
+        "Estado":  "ESTABLE"
+    },
+    {
+        "Usuarios":  25,
+        "Peticiones":  94,
+        "Errores":  5,
+        "TasaErrorPct":  5.32,
+        "ThroughputReqSec":  3.76,
+        "MediaMs":  6807.2,
+        "MedianaP50Ms":  7268,
+        "P90Ms":  9565,
+        "P95Ms":  10011,
+        "P99Ms":  10019,
+        "MinMs":  1011,
+        "MaxMs":  10019,
+        "Estado":  "PUNTO DE QUIEBRE"
+    },
+    {
+        "Usuarios":  50,
+        "Peticiones":  157,
+        "Errores":  145,
+        "TasaErrorPct":  92.36,
+        "ThroughputReqSec":  6.28,
+        "MediaMs":  9652.7,
+        "MedianaP50Ms":  10010,
+        "P90Ms":  10018,
+        "P95Ms":  10020,
+        "P99Ms":  10021,
+        "MinMs":  3069,
+        "MaxMs":  10024,
+        "Estado":  "PUNTO DE QUIEBRE"
+    }
+]

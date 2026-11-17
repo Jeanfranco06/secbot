@@ -1,0 +1,17 @@
+{
+    "TipoPrueba":  "Potencia (Spike)",
+    "UsuariosPico":  40,
+    "RampUpSec":  1,
+    "Peticiones":  101,
+    "Errores":  74,
+    "TasaErrorPct":  73.27,
+    "ThroughputReqSec":  5.05,
+    "MediaMs":  9618.4,
+    "MedianaP50Ms":  10008,
+    "P90Ms":  10017,
+    "P95Ms":  10017,
+    "P99Ms":  10018,
+    "MinMs":  5962,
+    "MaxMs":  10026,
+    "Observacion":  "Evalúa resiliencia ante picos de demanda instantáneos"
+}
