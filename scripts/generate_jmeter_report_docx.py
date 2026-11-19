@@ -6,7 +6,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
 
-OUT_DOCX = "/tmp/informe_practica_jmeter_secbot.docx"
+OUT_DOCX = "docs/informe_practica_jmeter_secbot.docx"
 
 doc = docx.Document()
 

@@ -1,0 +1,8 @@
+test_case,sender,subject,body,expected_status
+empty_fields,"","","",200
+missing_body,user@empresa.local,"Asunto sin cuerpo","",200
+html_script_injection,attacker@malicious.com,"<script>alert('xss')</script>","Cuerpo con inyeccion <img src=x onerror=alert(1)> y enlace http://evil.com/xss",200
+sqli_injection,hacker@threat.net,"' OR '1'='1","SELECT * FROM users WHERE '1'='1' http://evil-sqli.com",200
+massive_urls,spammer@bulk.org,"Multiples enlaces sospechosos","http://url1.xyz http://url2.top http://url3.buzz http://url4.cc http://url5.tk http://url6.xyz http://url7.top http://url8.buzz http://url9.cc http://url10.tk",200
+unicode_emojis,spoof@brand.xyz,"🚨 URGENTE 🚨 Su cuenta 🏦 fue hackeada ⚠️","Estimado usuario 👤 verifique su contraseña 🔑 inmediatamente en http://banco-login.xyz 💸",200
+oversized_payload,sender@domain.com,"Payload de 5KB repetido","Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. http://link-de-prueba.xyz/path ".repeat_sample,200

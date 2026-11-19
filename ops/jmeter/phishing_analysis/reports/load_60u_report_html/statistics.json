@@ -1,0 +1,34 @@
+{
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 4848,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 109.76423267326743,
+    "medianResTime" : 99.0,
+    "minResTime" : 8.0,
+    "maxResTime" : 407.0,
+    "pct1ResTime" : 228.10000000000036,
+    "pct2ResTime" : 290.0,
+    "pct3ResTime" : 339.0,
+    "throughput" : 244.3178954795142,
+    "receivedKBytesPerSec" : 351.19378527692385,
+    "sentKBytesPerSec" : 271.15960878836364
+  },
+  "POST /api/v1/chat/analyze-email" : {
+    "transaction" : "POST /api/v1/chat/analyze-email",
+    "sampleCount" : 4848,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 109.76423267326743,
+    "medianResTime" : 99.0,
+    "minResTime" : 8.0,
+    "maxResTime" : 407.0,
+    "pct1ResTime" : 228.10000000000036,
+    "pct2ResTime" : 290.0,
+    "pct3ResTime" : 339.0,
+    "throughput" : 244.3178954795142,
+    "receivedKBytesPerSec" : 351.19378527692385,
+    "sentKBytesPerSec" : 271.15960878836364
+  }
+}

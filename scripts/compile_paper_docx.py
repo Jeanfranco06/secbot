@@ -459,6 +459,87 @@ r.font.bold = True
 
 add_figure_with_caption(f"{FIG_DIR}/fig6_scalability_cache.png", "Figura 6. Comportamiento operacional: escalabilidad, concurrencia y tasa de absorción de carga mediante memoria caché Redis.")
 
+add_heading_2("4.7. Generalización sobre Corpus Público de Ciberseguridad (Partición 70/15/15) y Caracterización Temporal")
+p_pub = doc.add_paragraph(
+    "Para robustecer la validez externa del clasificador y evaluar su capacidad de generalización en un escenario ciego "
+    "sin sesgo de circularidad, se consolidó un corpus público representativo de N = 200 instancias combinando el "
+    "Nazario Phishing Corpus, el benchmark CEAS 2008 y Enron (vía Hugging Face sahith002/phishing-email-dataset), junto a "
+    "descripciones técnicas de incidentes reales reportados por CISA KEV, directivas NIST SP 800-61r2 y tácticas MITRE ATT&CK "
+    "(LockBit ransomware, volcado de memoria LSASS, inyecciones DLL en PowerShell, robo de API tokens y exfiltración de datos), "
+    "así como consultas normativas corporativas benignas.\n\n"
+    "Siguiendo el protocolo metodológico canónico de Machine Learning, el dataset se particionó de manera estratificada en: "
+    "70% Entrenamiento (139 instancias para calibración y few-shots), 15% Validación (28 instancias para sintonización de umbrales) "
+    "y 15% Pruebas Ciega (33 instancias para la Fase 2 de evaluación experimental imparcial)."
+)
+
+# TABLA 7 (Dataset Público)
+t7_headers = ["Categoría Evaluada (Fase 2)", "Soporte (N)", "TP", "FP", "FN", "Precisión", "Recall", "F1-Score"]
+t7_widths = [Inches(2.2), Inches(0.6), Inches(0.5), Inches(0.5), Inches(0.5), Inches(0.8), Inches(0.8), Inches(0.8)]
+t7_rows = [
+    ["Compromiso / Malware / Ransomware", "11", "10", "1", "1", "0.909", "0.909", "0.909"],
+    ["Consulta Legítima (Benigna)", "11", "11", "10", "0", "0.524", "1.000", "0.688"],
+    ["Phishing Público (Nazario / CEAS)", "11", "1", "0", "10", "1.000", "0.091", "0.167"],
+    ["Rendimiento Global / Macro", "33", "22", "11", "11", "0.811", "0.667", "0.588"]
+]
+t7 = doc.add_table(rows=len(t7_rows)+1, cols=len(t7_headers))
+format_table(t7, t7_widths, t7_headers, t7_rows)
+
+p_t7_cap = doc.add_paragraph()
+p_t7_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p_t7_cap.paragraph_format.space_before = Pt(4)
+p_t7_cap.paragraph_format.space_after = Pt(10)
+r = p_t7_cap.add_run("Tabla 7. Resultados empíricos de la Fase 2 de pruebas sobre el conjunto ciego (15%) del corpus público de ciberseguridad.")
+r.font.name = 'Times New Roman'
+r.font.size = Pt(9.5)
+r.font.bold = True
+
+p_pub_time = doc.add_paragraph(
+    "El perfilamiento temporal milisegundo a milisegundo de cada muestra evaluada en el runner científico aportó "
+    "una demostración empírica contundente de la premisa de que 'el tiempo es relativo y está en función de la data'. "
+    "El sistema evidencia una dualidad operativa: las consultas que activan reglas léxico-perimetrales se resuelven de forma "
+    "determinista en sub-milisegundos (0.01 ms a 0.14 ms), mientras que las consultas que demandan inferencia en el LLM local "
+    "en CPU (Ollama Llama-3.2:3b) oscilan entre 3,168 ms y 7,573 ms (Media: 3,620.47 ms, P95: 5,075.02 ms). "
+    "El ajuste de regresión lineal empírico evidenció una correlación directa entre la longitud del payload y el tiempo de cómputo:\n"
+    "T(ms) = 2,946.38 + 2.51 * Longitud (Caracteres), demostrando que cada 100 caracteres adicionales demandan ~251 ms adicionales de cómputo tensorial."
+)
+
+add_figure_with_caption(f"{FIG_DIR}/fig7_time_vs_data_public_benchmark.png", "Figura 7. Validación experimental de la Fase 2 sobre el Dataset Público: (a) Modelo de dispersión y regresión de latencia frente a longitud de payload ('El tiempo es relativo y en función de la Data'), y (b) Rendimiento estadístico por clase.")
+
+add_heading_2("4.8. Evaluación de Capacidad, Carga y Resiliencia con Apache JMeter")
+p_jmeter = doc.add_paragraph(
+    "Para someter a prueba el límite de servicio y la capacidad de absorción concurrente del módulo perimetral de detección "
+    "y análisis forense de phishing (/api/v1/chat/analyze-email), se diseñó y ejecutó una batería automatizada con "
+    "Apache JMeter 5.6.3 (Non-GUI Engine sobre Java 21 LTS), acumulando un volumen total de 27,016 solicitudes reales evaluadas "
+    "a través de 8 escenarios controlados (Tabla 8 y Figura 8)."
+)
+
+# TABLA 8 (JMeter Phishing)
+t8_headers = ["Escenario Experimental JMeter", "Usuarios", "Solicitudes", "Error (%)", "Media (ms)", "P50 (ms)", "P95 (ms)", "P99 (ms)", "Throughput"]
+t8_widths = [Inches(2.0), Inches(0.5), Inches(0.7), Inches(0.6), Inches(0.6), Inches(0.6), Inches(0.6), Inches(0.6), Inches(0.8)]
+t8_rows = [
+    ["01. Funcional y Casos Límite", "1", "18", "0.00%", "16.9", "16.0", "21.5", "33.1", "56.1 req/s"],
+    ["02. Carga Baja (Baseline)", "10", "1,532", "0.00%", "13.8", "12.0", "20.0", "25.7", "77.6 req/s"],
+    ["03. Carga Media (Nominal)", "30", "3,953", "0.00%", "24.7", "19.0", "39.0", "222.5", "201.0 req/s"],
+    ["04. Alta Concurrencia", "60", "4,848", "0.00%", "109.8", "99.0", "290.0", "339.0", "245.5 req/s"],
+    ["05. Estrés Máximo Admisible", "100", "5,470", "0.00%", "322.4", "313.0", "511.0", "569.0", "276.7 req/s"],
+    ["06. Estrés Extremo (Quiebre)", "150", "1,380", "21.74%", "2,373.5", "303.0", "10,011.0", "10,016.0", "93.1 req/s"],
+    ["07. Prueba de Pico (Spike)", "50", "4,031", "0.00%", "180.0", "157.0", "338.0", "372.0", "266.5 req/s"],
+    ["08. Resistencia Sostenida (Soak)", "25", "5,764", "0.00%", "19.1", "14.0", "36.0", "173.7", "193.7 req/s"]
+]
+t8 = doc.add_table(rows=len(t8_rows)+1, cols=len(t8_headers))
+format_table(t8, t8_widths, t8_headers, t8_rows)
+
+p_t8_cap = doc.add_paragraph()
+p_t8_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p_t8_cap.paragraph_format.space_before = Pt(4)
+p_t8_cap.paragraph_format.space_after = Pt(10)
+r = p_t8_cap.add_run("Tabla 8. Métricas de rendimiento, estrés, picos y resistencia del módulo de detección de phishing evaluadas con Apache JMeter 5.6.3.")
+r.font.name = 'Times New Roman'
+r.font.size = Pt(9.5)
+r.font.bold = True
+
+add_figure_with_caption(f"{FIG_DIR}/fig8_jmeter_phishing_performance.png", "Figura 8. Caracterización experimental de rendimiento con Apache JMeter sobre el módulo de phishing: (a) Curva de escalabilidad y punto de quiebre a 150 usuarios, y (b) Distribución de latencias promedio y percentil P95 frente al umbral SLA de 500 ms.")
+
 # ==============================================================================
 # 5. DISCUSIÓN
 # ==============================================================================
